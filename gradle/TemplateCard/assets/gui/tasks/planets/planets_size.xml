@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="planets_size" xmlns="teemu.xml.tasks">
+    <title>Planet size</title>
+    <unit>mil</unit>
+    <unitLabel>mil</unitLabel>
+    <instruction>Order the planets by size, from smallest to largest</instruction>
+    <intro>sort these planets by their size</intro>
+    <whichItem>which planet</whichItem>
+    <isSmallest>is the smallest planet</isSmallest>
+    <isSmallerThan>is smaller than</isSmallerThan>
+    <theSmallest>the smallest</theSmallest>
+    <isLargest>is the largest planet</isLargest>
+    <isLargerThan>is larger than</isLargerThan>
+    <theLargest>the largest</theLargest>
+    <grammar>
+        <smaller>smaller</smaller>
+        <smallest>smallest</smallest>
+        <larger>larger</larger>
+        <largest>largest</largest>
+    </grammar>
+    <cards>
+        <card id="venus" image="_venus.jpg" name="Venus" truth="1210.0">
+            <grammar>venus</grammar>
+            <comment>Venus is sometime called the evening star, but I don't know whether that means it is big</comment>
+        </card>
+        <card id="earth" image="jorden.jpg" name="Earth" truth="1276.0">
+            <grammar>earth</grammar>
+            <comment>The Earth is probably not a very big planet</comment>
+        </card>
+        <card id="mars" image="_mars.jpg" name="Mars" truth="679.0">
+            <grammar>mars</grammar>
+            <comment>I have heard that they send robots to Mars, but I have never been there</comment>
+            <question>
+                <ask>Would you like to travel to Mars if it was possible?</ask>
+                <answer>I would really like to go there</answer>
+            </question>
+        </card>
+        <card id="uranus" image="_uranus.jpg" name="Uranus" truth="5181.0">
+            <grammar>uranus</grammar>
+            <comment>I have heard that Uranus has more than 20 moons, so it should be fairly large</comment>
+        </card>
+        <card id="neptune" image="neptunus.jpg" name="Neptune" truth="4950.0">
+            <grammar>neptune</grammar>
+            <question>
+                <ask>Isn't Neptune very far out in the solar system?</ask>
+                <answer>I think that the distal planets are pretty large</answer>
+            </question>
+        </card>
+        <card id="saturn" image="saturnus.jpg" name="Saturn" truth="11650.0">
+            <grammar>saturn</grammar>
+            <comment>I guess that the rings of Saturn are not included in its size</comment>
+        </card>
+        <card id="jupiter" image="jupiter.jpg" name="Jupiter" truth="13982.0">
+            <grammar>jupiter</grammar>
+            <question>
+                <ask>Isn't Jupiter counted as one of the giants?</ask>
+                <answer>It probably means that it is very large</answer>
+            </question>
+        </card>
+    </cards>
+</task>
