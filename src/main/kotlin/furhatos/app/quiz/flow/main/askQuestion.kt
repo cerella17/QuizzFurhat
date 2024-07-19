@@ -17,6 +17,8 @@ var questionUnanswered = false // Track if the question is unanswered
 var scoreTeamRed = 0
 var scoreTeamBlue = 0
 
+var responseTimeout = 30000 // Timeout duration for responses in milliseconds
+
 val AskQuestion: State = state(parent = Parent) {
     var failedAttempts = 0
 
@@ -40,9 +42,9 @@ val AskQuestion: State = state(parent = Parent) {
 
         // Ask the question followed by the options
         if (questionUnanswered) {
-            furhat.ask("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
+            furhat.ask("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}", timeout = responseTimeout)
         } else {
-            furhat.ask("${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
+            furhat.ask("${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}", timeout = responseTimeout)
         }
     }
 
@@ -62,7 +64,7 @@ val AskQuestion: State = state(parent = Parent) {
             teamAnnounced = true
         }
 
-        furhat.ask("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
+        furhat.ask("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}", timeout = responseTimeout)
     }
 
     // User is answering with any of the alternatives
@@ -135,15 +137,15 @@ val AskQuestion: State = state(parent = Parent) {
 
     onResponse<RequestRepeatQuestion> {
         furhat.gesture(Gestures.BrowRaise)
-        furhat.ask(QuestionSet.current.text)
+        furhat.ask(QuestionSet.current.text, timeout = responseTimeout)
     }
 
     // The user wants to hear the options again
     onResponse<RequestRepeatOptions> {
         furhat.gesture(Gestures.Surprise)
         random(
-            { furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}") },
-            { furhat.ask(QuestionSet.current.getOptionsString()) }
+            { furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}", timeout = responseTimeout) },
+            { furhat.ask(QuestionSet.current.getOptionsString(), timeout = responseTimeout) }
         )
     }
 
@@ -174,10 +176,10 @@ val AskQuestion: State = state(parent = Parent) {
     onResponse {
         failedAttempts++
         when (failedAttempts) {
-            1 -> furhat.ask("Non ho capito, scusa. Riprova!")
+            1 -> furhat.ask("Non ho capito, scusa. Riprova!", timeout = responseTimeout)
             2 -> {
                 furhat.say("Mi dispiace, ancora non ho capito")
-                furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}")
+                furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}", timeout = responseTimeout)
             }
             else -> {
                 furhat.say("Non riesco ancora a capire. Proviamo una nuova domanda")
@@ -218,4 +220,3 @@ val NewQuestion: State = state(parent = Parent) {
         goto(AskQuestion) // Explicit state type
     }
 }
-
