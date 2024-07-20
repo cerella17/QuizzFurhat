@@ -32,21 +32,29 @@ val AskQuestion: State = state(parent = Parent) {
         // Imposta le frasi di riconoscimento vocale in base alle risposte della domanda corrente
         furhat.setSpeechRecPhrases(QuestionSet.current.speechPhrases)
 
-        // Annuncia per quale squadra è la domanda, se non è già stato annunciato
-        if (!teamAnnounced) {
-            furhat.say(
-                when (currentTeam) {
-                    "red" -> "Tocca alla squadra rossa."
-                    "blue" -> "Tocca alla squadra blu."
-                    else -> throw IllegalStateException("La squadra corrente deve essere 'red' o 'blue'")
-                }
-            )
-            teamAnnounced = true
+        // Annuncia per quale squadra è la domanda e aggiorna l'attenzione del robot
+        val nextUser = if (currentTeam == "red") {
+            users.redTeam().firstOrNull()
+        } else {
+            users.blueTeam().firstOrNull()
         }
+
+        if (nextUser != null) {
+            furhat.attend(nextUser)
+        }
+
+        furhat.say(
+            when (currentTeam) {
+                "red" -> "Tocca alla squadra rossa."
+                "blue" -> "Tocca alla squadra blu."
+                else -> throw IllegalStateException("La squadra corrente deve essere 'red' o 'blue'")
+            }
+        )
+        teamAnnounced = true
 
         // Annuncia la domanda
         if (questionUnanswered) {
-            furhat.say("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
+            furhat.say("Le opzioni sono,  ${QuestionSet.current.getOptionsString()}")
         } else {
             furhat.say("${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
         }
@@ -125,6 +133,17 @@ val AskQuestion: State = state(parent = Parent) {
             currentTeam = if (currentTeam == "red") "blue" else "red"
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
             questionUnanswered = true // Imposta il flag della domanda senza risposta
+
+            // Aggiorna l'attenzione del robot per la squadra corrente
+            val nextUser = if (currentTeam == "red") {
+                users.redTeam().firstOrNull()
+            } else {
+                users.blueTeam().firstOrNull()
+            }
+
+            if (nextUser != null) {
+                furhat.attend(nextUser)
+            }
 
             // Ripeti la stessa domanda alla squadra opposta
             reentry()
@@ -267,6 +286,17 @@ val ListenForAnswer: State = state(parent = Parent) {
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
             questionUnanswered = true // Imposta il flag della domanda senza risposta
 
+            // Aggiorna l'attenzione del robot per la squadra corrente
+            val nextUser = if (currentTeam == "red") {
+                users.redTeam().firstOrNull()
+            } else {
+                users.blueTeam().firstOrNull()
+            }
+
+            if (nextUser != null) {
+                furhat.attend(nextUser)
+            }
+
             // Ripeti la stessa domanda alla squadra opposta
             goto(AskQuestion)
         }
@@ -324,17 +354,7 @@ val NewQuestion: State = state(parent = Parent) {
             users.blueTeam().firstOrNull()
         }
 
-        if (nextUser != null) {
-            furhat.attend(nextUser)
-            furhat.say(
-                when (currentTeam) {
-                    "red" -> "Ora tocca alla squadra rossa."
-                    "blue" -> "Ora tocca alla squadra blu."
-                    else -> throw IllegalStateException("La squadra corrente deve essere 'red' o 'blue'")
-                }
-            )
-            teamAnnounced = true // Imposta il flag di annuncio
-        }
+
 
         // Poni una nuova domanda
         QuestionSet.next()

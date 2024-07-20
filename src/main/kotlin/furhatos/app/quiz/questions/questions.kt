@@ -58,7 +58,7 @@ class Question(val text: String, answer: List<String>, alternatives: List<List<S
     //Returns the well formatted answer options
     fun getOptionsString() : String {
         var text = TextBuilder()
-        text.appendList(primeoptions.map { it.wordString }, "or")
+        text.appendList(primeoptions.map { it.wordString }, "o")
         return text.toString()
     }
 

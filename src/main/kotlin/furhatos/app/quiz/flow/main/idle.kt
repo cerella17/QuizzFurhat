@@ -39,7 +39,7 @@ val Idle: State = state {
 }
 
 // Variabili
-val maxRounds = 1
+val maxRounds = 2
 var rounds = 0
 var shouldChangeUser = true
 var playing = false
@@ -80,10 +80,13 @@ fun QueryPerson(user: User) = state(parent = Parent) {
                 leaders[0].quiz.team = "blue"
             }
 
+            println("Leader rossa: ${leaders[0].quiz.team}, Leader blu: ${leaders[1].quiz.team}") // Log delle squadre assegnate
+
             goto(askNameRed(leaders[0], leaders[1]))
         }
     }
 }
+
 
 fun askNameRed(leaderRed: User, leaderBlue: User) = state {
     onEntry {
@@ -94,6 +97,7 @@ fun askNameRed(leaderRed: User, leaderBlue: User) = state {
     onResponse {
         val nameRed = it.text
         leaderRed.quiz.namePlayerRed = nameRed
+        println("Nome del capo squadra rossa: $nameRed") // Log del nome del capo squadra rossa
         furhat.say("Piacere di conoscerti $nameRed, capo squadra rossa")
         goto(askNameBlue(leaderBlue, leaderRed))
     }
@@ -108,6 +112,7 @@ fun askNameBlue(leaderBlue: User, leaderRed: User) = state {
     onResponse {
         val nameBlue = it.text
         leaderBlue.quiz.namePlayerBlue = nameBlue
+        println("Nome del capo squadra blu: $nameBlue") // Log del nome del capo squadra blu
         furhat.say("Piacere di conoscerti $nameBlue, capo squadra blu")
 
         // Imposta entrambi i capi squadra come giocatori attivi
@@ -116,26 +121,13 @@ fun askNameBlue(leaderBlue: User, leaderRed: User) = state {
         }
 
         // Procedi allo stato di nuova partita
-        goto(StartNewGame)
+        goto(NewGame)
     }
 }
 
 fun isUserLeft(user: User): Boolean {
-    return user.head.location.x > 0
+    // Supponiamo che una posizione x negativa significhi che l'utente è a sinistra.
+    return user.head.location.x < 0
 }
 
-val StartNewGame = state(parent = Parent) {
-    onEntry {
-        playing = true
-        rounds = 0
 
-        furhat.say("Ti farò $maxRounds domande a scelta multipla. Vediamo quanti punti riuscirete a ottenere.")
-        if (users.count > 1) {
-            furhat.say("Se rispondete in modo errato, la domanda passerà alla persona successiva.")
-        }
-
-        furhat.say("Bene, iniziamo!")
-        QuestionSet.next()
-        goto(AskQuestion)
-    }
-}
