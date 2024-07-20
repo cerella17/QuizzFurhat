@@ -12,12 +12,20 @@ val NewGame = state(parent = Parent) {
         playing = true
         rounds = 0
 
-        furhat.say("Ti farò $maxRounds domande a scelta multipla. E vedremo quanti punti riuscirai a ottenere.")
+        // Spiega le regole del gioco al plurale
+        furhat.say("Benvenuti al quiz! Vi farò $maxRounds domande a scelta multipla.")
+        furhat.say("Ogni domanda avrà diverse opzioni di risposta. Dovrete scegliere quella corretta per guadagnare punti.")
+        furhat.say("Se rispondete correttamente, guadagnerete un punto. Se sbagliate, la domanda passerà alla squadra avversaria.")
+
+        // Se ci sono più giocatori, spiega la regola per le risposte errate
         if (users.count > 1) {
-            furhat.say("Se rispondi in modo errato, la domanda passerà alla persona successiva.")
+            furhat.say("Dato che ci sono più giocatori, se rispondete in modo errato, la domanda passerà al prossimo giocatore.")
         }
 
-        furhat.say("Bene, iniziamo!")
+        // Annuncia l'inizio del gioco
+        furhat.say("Bene, iniziamo! Preparatevi per la prima domanda.")
+
+        // Poni la prima domanda
         QuestionSet.next()
         goto(AskQuestion)
     }

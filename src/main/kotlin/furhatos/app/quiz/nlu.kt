@@ -9,10 +9,10 @@ import furhatos.util.Language
 class DontKnow : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-                "I don't know",
-                "don't know",
-                "no idea",
-                "I have no idea"
+            "Non lo so",
+            "Non so",
+            "Nessuna idea",
+            "Non ho idea"
         )
     }
 }
@@ -20,8 +20,8 @@ class DontKnow : Intent() {
 class RequestRules : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-                "what are the rules",
-                "how does it work"
+            "Quali sono le regole",
+            "Come funziona"
         )
     }
 }
@@ -29,9 +29,9 @@ class RequestRules : Intent() {
 class RequestRepeatQuestion : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-                "what was the question",
-                "can you repeat the question",
-                "what was the question again"
+            "Qual era la domanda",
+            "Puoi ripetere la domanda",
+            "Qual era la domanda di nuovo"
         )
     }
 }
@@ -39,9 +39,9 @@ class RequestRepeatQuestion : Intent() {
 class RequestRepeatOptions : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-                "what are the options",
-                "can you repeat the options",
-                "what was the options"
+            "Quali sono le opzioni",
+            "Puoi ripetere le opzioni",
+            "Quali erano le opzioni"
         )
     }
 }
@@ -50,11 +50,11 @@ class AnswerOption : EnumEntity {
 
     var correct : Boolean = false
 
-    // Every entity and intent needs an empty constructor.
+    // Ogni entità e intento necessita di un costruttore vuoto.
     constructor() {
     }
 
-    // Since we are overwriting the value, we need to use this custom constructor
+    // Poiché stiamo sovrascrivendo il valore, dobbiamo usare questo costruttore personalizzato
     constructor(correct : Boolean, value : String) {
         this.correct = correct
         this.value = value
