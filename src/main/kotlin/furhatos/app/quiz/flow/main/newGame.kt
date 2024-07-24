@@ -18,6 +18,7 @@ val NewGame = state(parent = Parent) {
         furhat.say("Benvenuti al quiz! Vi farò $maxRounds domande a scelta multipla.")
         furhat.say("Ogni domanda avrà diverse opzioni di risposta. Dovrete scegliere quella corretta per guadagnare punti.")
         furhat.say("Se rispondete correttamente, guadagnerete un punto. Se sbagliate, la domanda passerà alla squadra avversaria.")
+        furhat.say("Avrete 30 secondi per discutere con la vostra squadra prima di dare la risposta. Per dare la risposta, dite 'pronto'. Se il tempo scade, dovrete dare subito una risposta altrimenti la domanda passerà alla squadra avversaria.")
 
 
         // Annuncia l'inizio del gioco

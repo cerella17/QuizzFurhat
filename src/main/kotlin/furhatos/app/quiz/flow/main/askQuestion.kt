@@ -110,6 +110,15 @@ val AskQuestion: State = state(parent = Parent) {
                 goto(NewQuestion) // Stato esplicito
             }
         } else {
+
+            //espressioni random
+            val espressioniSimpatiche = listOf(
+                Gestures.Smile,
+                Gestures.Wink,
+                Gestures.BigSmile,
+                Gestures.BrowRaise,
+                Gestures.Nod
+            )
             furhat.gesture(Gestures.BrowFrown)
             random(
                 { furhat.say("Oh no, risposta ${furhat.voice.emphasis("sbagliata")}! Ma non ti preoccupare, succede!") },
@@ -126,8 +135,20 @@ val AskQuestion: State = state(parent = Parent) {
                 { furhat.say("Oh no, hai sbagliato! Stai giocando con la testa o con i piedi?") },
                 { furhat.say("Ops, risposta sbagliata. Forse dovresti chiedere aiuto a Google!") },
                 { furhat.say("Non è giusto! Hai studiato su Wikipedia?") },
-                { furhat.say("Ahia, risposta sbagliata. Hai dormito durante le lezioni?") }
-            )
+                { furhat.say("Ahia, risposta sbagliata. Hai dormito durante le lezioni?") },
+                { furhat.say("Oh oh, non è la risposta corretta. Forse è il momento di una pausa!") },
+                { furhat.say("Oh no, hai fatto cilecca! Ma va bene, riprova!") },
+                { furhat.say("Risposta sbagliata! Forse stai giocando con gli occhi chiusi?") },
+                { furhat.say("Oh no, questa è sbagliata! Sei sicuro di averci pensato bene?") },
+                { furhat.say("Ops, non è la risposta giusta. Hai sbagliato pagina del libro?") },
+                { furhat.say("Peccato, non è corretto. Magari la prossima volta!") },
+                { furhat.say("Eh no, risposta sbagliata! Hai fatto il pieno di caffè stamattina?") },
+                { furhat.say("Oh no, questa non è giusta. Forse hai bisogno di una rinfrescata!") },
+                { furhat.say("Ahimè, risposta errata. Ma non ti preoccupare, succede anche ai migliori!") },
+                { furhat.say("Oh no, non è corretto. Stavi pensando ad altro?") }
+            );
+
+
 
             // Alterna squadra
             currentTeam = if (currentTeam == "red") "blue" else "red"

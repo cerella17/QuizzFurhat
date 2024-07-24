@@ -19,21 +19,26 @@ val EndGame = state(parent = Parent) {
         val totalRedScore = redTeam.sumBy { it.quiz.scoreTeamRed }
         val totalBlueScore = blueTeam.sumBy { it.quiz.scoreTeamBlue }
 
+        // Funzione per gestire il singolare e il plurale dei punti
+        fun puntiToString(punti: Int): String {
+            return if (punti == 1) "un punto" else "$punti punti"
+        }
+
         // Annunciare i punteggi totali
         furhat.say("Ora annunciamo i risultati finali.")
-        furhat.say("La squadra rossa ha totalizzato $totalRedScore punti.")
-        furhat.say("La squadra blu ha totalizzato $totalBlueScore punti.")
+        furhat.say("La squadra rossa ha totalizzato ${puntiToString(totalRedScore)}.")
+        furhat.say("La squadra blu ha totalizzato ${puntiToString(totalBlueScore)}.")
 
         // Annunciare la squadra vincitrice
         when {
             totalRedScore > totalBlueScore -> {
-                furhat.say("Congratulazioni alla squadra rossa per aver vinto con $totalRedScore punti!")
+                furhat.say("Congratulazioni alla squadra rossa per aver vinto con ${puntiToString(totalRedScore)}!")
             }
             totalBlueScore > totalRedScore -> {
-                furhat.say("Congratulazioni alla squadra blu per aver vinto con $totalBlueScore punti!")
+                furhat.say("Congratulazioni alla squadra blu per aver vinto con ${puntiToString(totalBlueScore)}!")
             }
             else -> {
-                furhat.say("È un pareggio! Entrambe le squadre hanno totalizzato $totalRedScore punti.")
+                furhat.say("È un pareggio! Entrambe le squadre hanno totalizzato ${puntiToString(totalRedScore)}.")
             }
         }
 
