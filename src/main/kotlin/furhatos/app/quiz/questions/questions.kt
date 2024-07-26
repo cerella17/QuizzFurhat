@@ -3,38 +3,68 @@ package furhatos.app.quiz.questions
 import furhatos.app.quiz.AnswerOption
 import furhatos.nlu.EnumItem
 import furhatos.nlu.TextBuilder
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
 
 object QuestionSet {
 
-    var count : Int = 0
-    var current: Question = questionsItalian[Random().nextInt(questionsItalian.lastIndex)]
+    var count: Int = 0
+    lateinit var current: Question
+    private lateinit var questions: MutableList<Question>
 
     init {
-        questionsItalian.shuffle()
+        try {
+            loadQuestions()
+            questions.shuffle()
+            current = questions[Random().nextInt(questions.size)]
+        } catch (e: FileNotFoundException) {
+            println("Errore: Il file questions.json non è stato trovato. Assicurati che il file sia nella directory src/main/resources/")
+        }
     }
 
     fun next() {
         count++
-        if (count >= questionsItalian.size)
+        if (count >= questions.size)
             count = 0
-        current = questionsItalian[count]
+        current = questions[count]
         AnswerOption().forget()
     }
 
+    private fun loadQuestions() {
+        val filePath = "/Users/cerella17/Desktop/furhat-open-ai-main/TemplateQuizz/src/main/kotlin/furhatos/app/quiz/questions/domandeArchitettura.json"
+        val file = File(filePath)
+        if (!file.exists()) {
+            throw FileNotFoundException("Il file $filePath non è stato trovato.")
+        }
+        val fileContent = file.readText()
+        val questionList: List<QuestionIntermediate> = Json.decodeFromString(fileContent)
+        questions = questionList.map { it.toQuestion() }.toMutableList()
+    }
 }
 
-/**
- * The question class gets the following parameters:
- * @text : The question as a String
- * @answer : A list containing the correct answer to the question, followed by alternative pronunciations of the correct answer
- * @alternatives A list, containing lists of other (wrong) answers. Every other answer is also followed by alternative pronunciations of the correct answer.
- */
+@Serializable
+data class QuestionIntermediate(
+    val question: String, // Cambia 'text' a 'question'
+    val answer: List<String>,
+    val alternatives: List<List<String>>
+) {
+    fun toQuestion(): Question {
+        return Question(question, answer, alternatives)
+    }
+}
+
 class Question(val text: String, answer: List<String>, alternatives: List<List<String>>) {
     //All options, used to prime the NLU
-    var options : MutableList<EnumItem> = mutableListOf()
+    @Contextual
+    var options: MutableList<EnumItem> = mutableListOf()
     //Only the first option of the answers, these are correctly spelled, and not alternative.
-    var primeoptions : MutableList<EnumItem> = mutableListOf()
+    @Contextual
+    var primeoptions: MutableList<EnumItem> = mutableListOf()
 
     //init loads the first item of the list into primeoptions
     //And loads everything into options
@@ -56,15 +86,13 @@ class Question(val text: String, answer: List<String>, alternatives: List<List<S
     }
 
     //Returns the well formatted answer options
-    fun getOptionsString() : String {
-        var text = TextBuilder()
+    fun getOptionsString(): String {
+        val text = TextBuilder()
         text.appendList(primeoptions.map { it.wordString }, "o")
         return text.toString()
     }
 
     //Returns the well formatted answer options
-    val speechPhrases : List<String>
+    val speechPhrases: List<String>
         get() = primeoptions.map { it.wordString ?: "" }
-
 }
-
