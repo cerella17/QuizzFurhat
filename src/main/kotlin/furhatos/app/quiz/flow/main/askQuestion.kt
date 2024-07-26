@@ -14,12 +14,28 @@ import furhatos.nlu.common.RequestRepeat
 
 var currentTeam = "red" // Traccia la squadra corrente per alternare le domande
 var teamAnnounced = false // Traccia se l'annuncio della squadra è stato fatto
-var questionUnanswered = false // Traccia se la domanda è senza risposta
 var scoreTeamRed = 0
 var scoreTeamBlue = 0
 
 var responseTimeout = 10000 // Durata del timeout per le risposte in millisecondi
 var consultTime = 30000 // Tempo per la consultazione prima di ascoltare in millisecondi
+
+val NewQuestion: State = state(parent = Parent) {
+    onEntry {
+        /*
+            Se c'è più di un giocatore, determiniamo quale utente deve rispondere successivamente qui, basato sul booleano shouldChangeUser
+         */
+        val nextUser = if (currentTeam == "red") {
+            users.redTeam().firstOrNull()
+        } else {
+            users.blueTeam().firstOrNull()
+        }
+
+        // Poni una nuova domanda
+        QuestionSet.next()
+        goto(AskQuestion) // Stato esplicito
+    }
+}
 
 val AskQuestion: State = state(parent = Parent) {
     var failedAttempts = 0
@@ -53,11 +69,7 @@ val AskQuestion: State = state(parent = Parent) {
         teamAnnounced = true
 
         // Annuncia la domanda
-        if (questionUnanswered) {
-            furhat.say("Le opzioni sono,  ${QuestionSet.current.getOptionsString()}")
-        } else {
-            furhat.say("${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
-        }
+        furhat.say("${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
 
         // Inizia ad ascoltare per "pronto" o "sono pronto" durante il tempo di consultazione
         furhat.listen()
@@ -101,7 +113,6 @@ val AskQuestion: State = state(parent = Parent) {
             // Alterna squadra
             currentTeam = if (currentTeam == "red") "blue" else "red"
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
-            questionUnanswered = false // Resetta il flag della domanda senza risposta
             // Controlla se il gioco è finito e in caso contrario, passa a una nuova domanda
             if (++rounds >= maxRounds) {
                 furhat.say("Questa era l'ultima domanda")
@@ -110,15 +121,6 @@ val AskQuestion: State = state(parent = Parent) {
                 goto(NewQuestion) // Stato esplicito
             }
         } else {
-
-            //espressioni random
-            val espressioniSimpatiche = listOf(
-                Gestures.Smile,
-                Gestures.Wink,
-                Gestures.BigSmile,
-                Gestures.BrowRaise,
-                Gestures.Nod
-            )
             furhat.gesture(Gestures.BrowFrown)
             random(
                 { furhat.say("Oh no, risposta ${furhat.voice.emphasis("sbagliata")}! Ma non ti preoccupare, succede!") },
@@ -135,39 +137,15 @@ val AskQuestion: State = state(parent = Parent) {
                 { furhat.say("Oh no, hai sbagliato! Stai giocando con la testa o con i piedi?") },
                 { furhat.say("Ops, risposta sbagliata. Forse dovresti chiedere aiuto a Google!") },
                 { furhat.say("Non è giusto! Hai studiato su Wikipedia?") },
-                { furhat.say("Ahia, risposta sbagliata. Hai dormito durante le lezioni?") },
-                { furhat.say("Oh oh, non è la risposta corretta. Forse è il momento di una pausa!") },
-                { furhat.say("Oh no, hai fatto cilecca! Ma va bene, riprova!") },
-                { furhat.say("Risposta sbagliata! Forse stai giocando con gli occhi chiusi?") },
-                { furhat.say("Oh no, questa è sbagliata! Sei sicuro di averci pensato bene?") },
-                { furhat.say("Ops, non è la risposta giusta. Hai sbagliato pagina del libro?") },
-                { furhat.say("Peccato, non è corretto. Magari la prossima volta!") },
-                { furhat.say("Eh no, risposta sbagliata! Hai fatto il pieno di caffè stamattina?") },
-                { furhat.say("Oh no, questa non è giusta. Forse hai bisogno di una rinfrescata!") },
-                { furhat.say("Ahimè, risposta errata. Ma non ti preoccupare, succede anche ai migliori!") },
-                { furhat.say("Oh no, non è corretto. Stavi pensando ad altro?") }
-            );
+                { furhat.say("Ahia, risposta sbagliata. Hai dormito durante le lezioni?") }
+            )
 
-
-
-            // Alterna squadra
+            // Alterna squadra e passa a una nuova domanda
             currentTeam = if (currentTeam == "red") "blue" else "red"
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
-            questionUnanswered = true // Imposta il flag della domanda senza risposta
 
-            // Aggiorna l'attenzione del robot per la squadra corrente
-            val nextUser = if (currentTeam == "red") {
-                users.redTeam().firstOrNull()
-            } else {
-                users.blueTeam().firstOrNull()
-            }
-
-            if (nextUser != null) {
-                furhat.attend(nextUser)
-            }
-
-            // Ripeti la stessa domanda alla squadra opposta
-            reentry()
+            // Seleziona una nuova domanda per la squadra opposta
+            goto(NewQuestion)
         }
     }
 
@@ -176,7 +154,7 @@ val AskQuestion: State = state(parent = Parent) {
         furhat.say("Peccato. Ecco la prossima domanda")
         currentTeam = if (currentTeam == "red") "blue" else "red" // Alterna squadra
         teamAnnounced = false // Resetta il flag di annuncio
-        questionUnanswered = false // Resetta il flag della domanda senza risposta
+        // Seleziona una nuova domanda
         goto(NewQuestion) // Stato esplicito
     }
 
@@ -219,8 +197,8 @@ val AskQuestion: State = state(parent = Parent) {
             )
             currentTeam = if (currentTeam == "red") "blue" else "red" // Alterna squadra
             teamAnnounced = false // Resetta il flag di annuncio
-            questionUnanswered = true // Imposta il flag della domanda senza risposta
-            reentry()
+            // Seleziona una nuova domanda
+            goto(NewQuestion)
         } else {
             furhat.listen()
         }
@@ -242,7 +220,7 @@ val AskQuestion: State = state(parent = Parent) {
                     furhat.say("Non riesco ancora a capire. Proviamo una nuova domanda")
                     currentTeam = if (currentTeam == "red") "blue" else "red" // Alterna squadra
                     teamAnnounced = false // Resetta il flag di annuncio
-                    questionUnanswered = false // Resetta il flag della domanda senza risposta
+                    // Seleziona una nuova domanda
                     goto(NewQuestion) // Stato esplicito
                 }
             }
@@ -274,7 +252,6 @@ val ListenForAnswer: State = state(parent = Parent) {
             // Alterna squadra
             currentTeam = if (currentTeam == "red") "blue" else "red"
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
-            questionUnanswered = false // Resetta il flag della domanda senza risposta
             // Controlla se il gioco è finito e in caso contrario, passa a una nuova domanda
             if (++rounds >= maxRounds) {
                 furhat.say("Questa era l'ultima domanda")
@@ -302,24 +279,12 @@ val ListenForAnswer: State = state(parent = Parent) {
                 { furhat.say("Ahia, risposta sbagliata. Hai dormito durante le lezioni?") }
             )
 
-            // Alterna squadra
+            // Alterna squadra e passa a una nuova domanda
             currentTeam = if (currentTeam == "red") "blue" else "red"
             teamAnnounced = false // Resetta il flag di annuncio per la prossima squadra
-            questionUnanswered = true // Imposta il flag della domanda senza risposta
 
-            // Aggiorna l'attenzione del robot per la squadra corrente
-            val nextUser = if (currentTeam == "red") {
-                users.redTeam().firstOrNull()
-            } else {
-                users.blueTeam().firstOrNull()
-            }
-
-            if (nextUser != null) {
-                furhat.attend(nextUser)
-            }
-
-            // Ripeti la stessa domanda alla squadra opposta
-            goto(AskQuestion)
+            // Seleziona una nuova domanda per la squadra opposta
+            goto(NewQuestion)
         }
     }
 
@@ -328,7 +293,7 @@ val ListenForAnswer: State = state(parent = Parent) {
         furhat.say("Peccato. Ecco la prossima domanda")
         currentTeam = if (currentTeam == "red") "blue" else "red" // Alterna squadra
         teamAnnounced = false // Resetta il flag di annuncio
-        questionUnanswered = false // Resetta il flag della domanda senza risposta
+        // Seleziona una nuova domanda
         goto(NewQuestion) // Stato esplicito
     }
 
@@ -354,7 +319,7 @@ val ListenForAnswer: State = state(parent = Parent) {
         furhat.say("Non ho sentito nessuna risposta. Prossima domanda.")
         currentTeam = if (currentTeam == "red") "blue" else "red" // Alterna squadra
         teamAnnounced = false // Resetta il flag di annuncio
-        questionUnanswered = false // Resetta il flag della domanda senza risposta
+        // Seleziona una nuova domanda
         goto(NewQuestion) // Stato esplicito
     }
 
@@ -364,21 +329,4 @@ val ListenForAnswer: State = state(parent = Parent) {
     }
 }
 
-val NewQuestion: State = state(parent = Parent) {
-    onEntry {
-        /*
-            Se c'è più di un giocatore, determiniamo quale utente deve rispondere successivamente qui, basato sul booleano shouldChangeUser
-         */
-        val nextUser = if (currentTeam == "red") {
-            users.redTeam().firstOrNull()
-        } else {
-            users.blueTeam().firstOrNull()
-        }
 
-
-
-        // Poni una nuova domanda
-        QuestionSet.next()
-        goto(AskQuestion) // Stato esplicito
-    }
-}
