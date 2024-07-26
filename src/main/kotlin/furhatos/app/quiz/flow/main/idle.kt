@@ -4,6 +4,7 @@ import furhatos.app.quiz.flow.Parent
 import furhatos.app.quiz.questions.QuestionSet
 import furhatos.app.quiz.setting.*
 import furhatos.flow.kotlin.*
+import furhatos.nlu.common.RequestRepeat
 import furhatos.records.User
 import kotlin.random.Random
 
@@ -126,6 +127,14 @@ fun askNameRed(leaderRed: User, leaderBlue: User) = state {
         furhat.say("Piacere di conoscerti $nameRed, capo squadra rossa")
         goto(askNameBlue(leaderBlue, leaderRed))
     }
+
+    onNoResponse {
+        furhat.ask("Per favore, puoi ripetere il tuo nome?")
+    }
+
+    onResponse<RequestRepeat> {
+        furhat.ask("Per favore, ripeti il tuo nome.")
+    }
 }
 
 fun askNameBlue(leaderBlue: User, leaderRed: User) = state {
@@ -147,6 +156,14 @@ fun askNameBlue(leaderBlue: User, leaderRed: User) = state {
 
         // Procedi allo stato di nuova partita
         goto(NewGame)
+    }
+
+    onNoResponse {
+        furhat.ask("Per favore, puoi ripetere il tuo nome?")
+    }
+
+    onResponse<RequestRepeat> {
+        furhat.ask("Per favore, ripeti il tuo nome.")
     }
 }
 

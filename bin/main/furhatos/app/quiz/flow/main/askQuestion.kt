@@ -20,66 +20,66 @@ val AskQuestion: State = state(parent = Parent) {
     onEntry {
         failedAttempts = 0
 
-        // Set speech rec phrases based on the current question's answers
+        // Imposta le frasi di riconoscimento vocale in base alle risposte della domanda corrente
         furhat.setSpeechRecPhrases(QuestionSet.current.speechPhrases)
 
-        // Ask the question followed by the options
+        // Poni la domanda seguita dalle opzioni
         furhat.ask(QuestionSet.current.text + " " + QuestionSet.current.getOptionsString())
     }
 
-    // Here we re-state the question
+    // Qui ripetiamo la domanda
     onReentry {
         failedAttempts = 0
-        furhat.ask("The question was, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
+        furhat.ask("La domanda era, ${QuestionSet.current.text} ${QuestionSet.current.getOptionsString()}")
     }
 
-    // User is answering with any of the alternatives
+    // L'utente risponde con una delle alternative
     onResponse<AnswerOption> {
         val answer = it.intent
 
-        // If the user answers correct, we up the user's score and congratulates the user
+        // Se l'utente risponde correttamente, incrementa il punteggio della squadra e congratula la squadra
         if (answer.correct) {
             furhat.gesture(Gestures.Smile)
             users.current.quiz.score++
             random(
-                    { furhat.say("Great! That was the ${furhat.voice.emphasis("right")}  answer, you now have a score of ${users.current.quiz.score}") },
-                    { furhat.say("that was ${furhat.voice.emphasis("correct")}, you now have a score of ${users.current.quiz.score}") }
+                { furhat.say("Ottimo! Quella era la risposta ${furhat.voice.emphasis("giusta")}, ora hai un punteggio di ${users.current.quiz.score}") },
+                { furhat.say("Quella era ${furhat.voice.emphasis("corretta")}, ora hai un punteggio di ${users.current.quiz.score}") }
             )
             /*
-            If the user answers incorrect, we give another user the chance of answering if one is present in the game.
-            If we indeed ask another player, the furhat.ask() interrupts the rest of the handler.
+            Se l'utente risponde in modo errato, diamo un'altra possibilità a un altro utente presente nel gioco.
+            Se effettivamente chiediamo a un altro giocatore, la furhat.ask() interrompe il resto dell'handler.
              */
         } else {
             furhat.gesture(Gestures.BrowFrown)
-            furhat.say("Sorry, that was ${furhat.voice.emphasis("not")} correct")
+            furhat.say("Mi dispiace, quella era ${furhat.voice.emphasis("sbagliata")}")
 
-            // Keep track of what users answered what question so that we don't ask the same user
+            // Teniamo traccia di quale utente ha risposto a quale domanda per non chiedere la stessa domanda allo stesso utente
             users.current.quiz.questionsAsked.add(QuestionSet.current.text)
 
-            /* Find another user that has not answered this question and if so, asks them.
-             For the flow of the skill, we will continue asking the new user the next question through the
-             shouldChangeUser = false flag.
+            /* Trova un altro utente che non ha risposto a questa domanda e, se esiste, gliela chiede.
+             Per il flusso dell'abilità, continueremo a chiedere al nuovo utente la prossima domanda attraverso il
+             flag shouldChangeUser = false.
              */
             val availableUsers = users.notQuestioned(QuestionSet.current.text)
-            if (!availableUsers.isEmpty()) {
+            if (availableUsers.isNotEmpty()) {
                 furhat.attend(availableUsers.first())
                 shouldChangeUser = false
-                furhat.ask("Maybe you know the answer?")
+                furhat.ask("Forse tu conosci la risposta?")
             }
         }
 
-        // Check if the game has ended and if not, goes to a new question
+        // Controlla se il gioco è finito e, in caso contrario, passa a una nuova domanda
         if (++rounds >= maxRounds) {
-            furhat.say("That was the last question")
+            furhat.say("Quella era l'ultima domanda")
             goto(EndGame)
         } else {
             goto(NewQuestion)
         }
     }
 
-    // The users answers that they don't know
+    // Gli utenti rispondono che non sanno
     onResponse<DontKnow> {
-        furhat.say("Too bad. Here comes the next question")
+        furhat.say("Peccato. Ecco la prossima domanda")
         goto(NewQuestion)
     }
 
@@ -92,38 +92,37 @@ val AskQuestion: State = state(parent = Parent) {
         furhat.ask(QuestionSet.current.text)
     }
 
-    // The user wants to hear the options again
+    // L'utente vuole sentire di nuovo le opzioni
     onResponse<RequestRepeatOptions> {
         furhat.gesture(Gestures.Surprise)
         random(
-                { furhat.ask("They are ${QuestionSet.current.getOptionsString()}") },
-                { furhat.ask(QuestionSet.current.getOptionsString()) }
+            { furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}") },
+            { furhat.ask(QuestionSet.current.getOptionsString()) }
         )
     }
 
-    // If we don't get any response, we assume the user was too slow
+    // Se non riceviamo risposta, assumiamo che l'utente sia stato troppo lento
     onNoResponse {
         random(
-                { furhat.say("Too slow! Here comes the next question") },
-                { furhat.say("A bit too slow amigo! Get ready for the next question") }
+            { furhat.say("Troppo lento! Ecco la prossima domanda") },
+            { furhat.say("Un po' troppo lento amico! Preparati per la prossima domanda") }
         )
         goto(NewQuestion)
     }
 
-    /* If we get a response that doesn't map to any alternative or any of the above handlers,
-        we track how many times this has happened in a row and give them two more attempts and
-        finally moving on if we still don't get it.
+    /* Se riceviamo una risposta che non corrisponde a nessuna alternativa o a nessuno degli handler sopra,
+       tracciamo quante volte è successo di seguito e diamo loro due tentativi in più e alla fine andiamo avanti se ancora non capiamo.
      */
     onResponse {
         failedAttempts++
         when (failedAttempts) {
-            1 -> furhat.ask("I didn't get that, sorry. Try again!")
+            1 -> furhat.ask("Non ho capito, scusa. Riprova!")
             2 -> {
-                furhat.say("Sorry, I still didn't get that")
-                furhat.ask("The options are ${QuestionSet.current.getOptionsString()}")
+                furhat.say("Scusa, ancora non ho capito")
+                furhat.ask("Le opzioni sono ${QuestionSet.current.getOptionsString()}")
             }
             else -> {
-                furhat.say("Still couldn't get that. Let's try a new question")
+                furhat.say("Non riesco ancora a capire. Proviamo una nuova domanda")
                 shouldChangeUser = false
                 goto(NewQuestion)
             }
@@ -134,23 +133,23 @@ val AskQuestion: State = state(parent = Parent) {
 val NewQuestion = state(parent = Parent) {
     onEntry {
         /*
-            If more than one player, we determine what user to target next here, based on the shouldChangeUser boolean
+            Se ci sono più di un giocatore, determiniamo a quale utente rivolgerci successivamente qui, basandoci sul booleano shouldChangeUser
          */
         if (users.playing().count() > 1) {
             if (shouldChangeUser) {
                 val nextUser = users.nextPlaying()
                 furhat.attend(nextUser)
                 random(
-                        { furhat.say("The next one is for you") },
-                        { furhat.say("For you now") },
-                        { furhat.say("Now for you") }
+                    { furhat.say("La prossima è per te") },
+                    { furhat.say("Adesso tocca a te") },
+                    { furhat.say("Ora per te") }
                 )
             } else {
                 shouldChangeUser = true
                 random(
-                        { furhat.say("You get to continue") },
-                        { furhat.say("Next one coming up") },
-                        { furhat.say("Here's another one") }
+                    { furhat.say("Continui tu") },
+                    { furhat.say("Ecco la prossima") },
+                    { furhat.say("Eccone un'altra") }
                 )
             }
         }
@@ -158,16 +157,17 @@ val NewQuestion = state(parent = Parent) {
             furhat.say {
                 random {
                     block {
-                        +"But then I do want you to pay attention"
+                        +"Ma allora voglio che tu presti attenzione"
                         +Gestures.BigSmile
                     }
-                    +"Look at me, I'm captain now"
-                    +"Could you pay some attention to me"
+                    +"Guardami, ora sono io il capitano"
+                    +"Potresti prestare attenzione a me"
                 }
             }
         }
-        // Ask new question
+        // Poni una nuova domanda
         QuestionSet.next()
         goto(AskQuestion)
     }
 }
+
