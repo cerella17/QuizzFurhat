@@ -1,0 +1,29 @@
+[
+  {
+    "question": "Quale dei seguenti non è un tipo di memoria?",
+    "answer": [
+      "CPU",
+      "C P U",
+      "Central Processing Unit",
+      "Processore"
+    ],
+    "options": [
+      "RAM",
+      "ROM",
+      "CPU",
+      "Cache"
+    ]
+  },
+  {
+    "question": "Cosa significa RAM?",
+    "answer": [
+      "Random Access Memory"
+    ],
+    "options": [
+      "Read Access Memory",
+      "Random Access Memory",
+      "Rewritable Access Memory",
+      "Running Access Memory"
+    ]
+  }
+]
