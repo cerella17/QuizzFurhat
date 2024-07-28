@@ -1,0 +1,18 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "furhat-core": "^0.2.0",
+    "furhat-gui": "^0.1.0",
+    "nuxt": "^3.12.4",
+    "vue": "latest"
+  }
+}
