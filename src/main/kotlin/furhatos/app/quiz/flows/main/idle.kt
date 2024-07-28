@@ -115,7 +115,7 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
 
 val QuizGame: State = state {
     onEntry {
-        furhat.say("QUIZ STATE")
+        furhat.say("QUIZ STATE!")
     }
 }
 
