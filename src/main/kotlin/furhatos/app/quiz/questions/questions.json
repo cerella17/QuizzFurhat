@@ -1,7 +1,7 @@
 [
   {
     "question": "Quale dei seguenti non è un tipo di memoria?",
-    "answer": [
+    "answers": [
       "CPU",
       "C P U",
       "Central Processing Unit",
@@ -16,7 +16,7 @@
   },
   {
     "question": "Cosa significa RAM?",
-    "answer": [
+    "answers": [
       "Random Access Memory"
     ],
     "options": [

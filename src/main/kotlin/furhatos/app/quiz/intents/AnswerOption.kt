@@ -22,7 +22,7 @@ class AnswerOption : EnumEntity {
         return QuestionManager.current.answers.map {
             EnumItem(
                 AnswerOption(
-                    QuestionManager.current.correctAnswers.contains(it), it
+                    QuestionManager.current.answers.contains(it), it
                 ), it
             )
         }

@@ -1,6 +1,7 @@
 package furhatos.app.quiz.questions
 
 import furhatos.app.quiz.intents.AnswerOption
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -16,16 +17,17 @@ object QuestionManager {
         questions.shuffle()
     }
 
-    fun next() {
+    fun next(): Question {
         count++
         if (count >= questions.size)
             count = 0
-        current = questions[count]
         AnswerOption().forget()
+        current = questions[count]
+        return current
     }
 
     private fun loadQuestions() {
-        val file = File("./questions.json")
+        val file = File("src/main/kotlin/furhatos/app/quiz/questions/questions.json")
         if (!file.exists()) {
             throw FileNotFoundException("Il file non è stato trovato.")
         }
@@ -35,12 +37,13 @@ object QuestionManager {
     }
 }
 
+@Serializable
 class Question(
     val question: String,
     val answers: List<String>,
-    val correctAnswers: List<String>
+    val options: List<String>
 ) {
     fun isCorrect(answer: String): Boolean {
-        return correctAnswers.contains(answer)
+        return options.contains(answer)
     }
 }
