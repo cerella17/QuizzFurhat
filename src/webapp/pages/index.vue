@@ -1,10 +1,14 @@
 <script setup lang="ts">
-const furhat = useFurhat()
-furhat.subscribe("NewGameEvent", (event) => {
-  console.log("NewGameEvent", event)
-})
+const {gameData, currentQuestionData, questionCountDown, isGameEnded} = useFurhatData()
 </script>
 
 <template>
-  {{ furhat }}
+  <h1>Is Game Running: {{ !isGameEnded }}</h1>
+
+  <h2>Game Data</h2>
+  <pre>{{ gameData }}</pre>
+
+  <h1>Countdown: {{ questionCountDown }}</h1>
+  <h2>Current Question Data</h2>
+  <pre>{{ currentQuestionData }}</pre>
 </template>

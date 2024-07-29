@@ -1,4 +1,4 @@
-package furhatos.app.quiz.questions
+package furhatos.app.quiz.core.questions
 
 import furhatos.app.quiz.intents.AnswerOption
 import kotlinx.serialization.Serializable
@@ -7,14 +7,13 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
 
-object QuestionManager {
-    private var count: Int = 0
+class QuestionSet {
+    private var count: Int = -1
     private lateinit var questions: MutableList<Question>
     lateinit var current: Question
 
     init {
-        loadQuestions()
-        questions.shuffle()
+        loadAndShuffleQuestions()
     }
 
     fun next(): Question {
@@ -27,13 +26,18 @@ object QuestionManager {
     }
 
     private fun loadQuestions() {
-        val file = File("src/main/kotlin/furhatos/app/quiz/questions/questions.json")
+        val file = File("src/main/kotlin/furhatos/app/quiz/core/questions/questions.json")
         if (!file.exists()) {
             throw FileNotFoundException("Il file non è stato trovato.")
         }
         val jsonString = file.readText()
         val questionsList = Json.decodeFromString<List<Question>>(jsonString)
         questions = questionsList.toMutableList()
+    }
+
+    private fun loadAndShuffleQuestions() {
+        loadQuestions()
+        questions.shuffle()
     }
 }
 
@@ -44,6 +48,23 @@ class Question(
     val options: List<String>
 ) {
     fun isCorrect(answer: String): Boolean {
-        return options.contains(answer)
+        return answers.map { it.lowercase() }.contains(answer.lowercase())
+    }
+
+    fun correctAnswer(): String {
+        return answers.find { it in options } ?: ""
+    }
+
+    fun toQuestionTextSpeech(): String {
+        var optionsJoinedString = ""
+        for (i in options.indices) {
+            optionsJoinedString += options[i]
+            optionsJoinedString += if (i < options.size - 2) {
+                ". "
+            } else {
+                " oppure "
+            }
+        }
+        return "$question $optionsJoinedString"
     }
 }

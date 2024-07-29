@@ -1,6 +1,6 @@
 package furhatos.app.quiz.intents
 
-import furhatos.app.quiz.questions.QuestionManager
+import furhatos.app.quiz.core.QuizGameManager
 import furhatos.nlu.EnumEntity
 import furhatos.nlu.EnumItem
 import furhatos.util.Language
@@ -19,10 +19,15 @@ class AnswerOption : EnumEntity {
     }
 
     override fun getEnumItems(lang: Language): List<EnumItem> {
-        return QuestionManager.current.answers.map {
+        // merge QuizGameManager.QuestionSet.current.options and QuizGameManager.QuestionSet.current.answers
+        val all = listOf(
+            QuizGameManager.QuestionSet.current.options,
+            QuizGameManager.QuestionSet.current.answers
+        ).flatten().distinct()
+        return all.map {
             EnumItem(
                 AnswerOption(
-                    QuestionManager.current.answers.contains(it), it
+                    QuizGameManager.QuestionSet.current.isCorrect(it), it
                 ), it
             )
         }

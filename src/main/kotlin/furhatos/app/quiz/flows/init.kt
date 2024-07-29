@@ -1,6 +1,9 @@
 package furhatos.app.quiz.flows
 
+import furhatos.app.quiz.core.QuizGameManager
+import furhatos.app.quiz.events.QuestionAnswerEvent
 import furhatos.app.quiz.flows.main.Idle
+import furhatos.app.quiz.flows.main.PreQuiz
 import furhatos.app.quiz.setting.initEngagementDistance
 import furhatos.app.quiz.setting.initEngagementMaxUsers
 import furhatos.flow.kotlin.State
@@ -20,6 +23,6 @@ val Init: State = state() {
         // Host the GUI
         RemoteGUI("WEBAPP", port = 3000)
 
-        goto(Idle)
+        goto(PreQuiz)
     }
 }

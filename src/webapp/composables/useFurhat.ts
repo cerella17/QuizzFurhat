@@ -8,7 +8,29 @@ export default function useFurhat() {
 
 interface IEvents {
     NewGameEvent: {
-        www: string
+        redLeaderName: string,
+        blueLeaderName: string,
+        maxRounds: number
+    },
+    AskQuestionEvent: {
+        question: string,
+        options: string[],
+        team: "RED" | "BLUE",
+        timeInMs: number
+    }
+    QuestionAnswerEvent: {
+        answer: string,
+        correctAnswer: string,
+        correct: boolean
+    }
+    SyncInformationEvent: {
+        round: number,
+        redScore: number,
+        blueScore: number
+    }
+    EndGameEvent: {
+        redScore: number,
+        blueScore: number,
     }
 }
 

@@ -1,9 +1,14 @@
 package furhatos.app.quiz.flows.main
 
+import furhatos.app.quiz.core.QuizGameManager
+import furhatos.app.quiz.core.UserData
+import furhatos.app.quiz.events.*
+import furhatos.app.quiz.intents.AnswerOption
 import furhatos.app.quiz.intents.ImReady
 import furhatos.app.quiz.setting.*
 import furhatos.flow.kotlin.*
 import furhatos.records.User
+import furhatos.util.Language
 import kotlin.random.Random
 
 // Stato iniziale
@@ -77,48 +82,167 @@ val PreQuiz: State = state {
 }
 
 fun assignTeamToLeaders(user1: User, user2: User) = state {
+    var currentTeam = TeamEnum.RED
     onEntry {
-        // Assegna red al primo e blue al secondo
-        user1.gameData.team = TeamEnum.RED
-        user2.gameData.team = TeamEnum.BLUE
-
         // Guarda user1 e chiedi il nome
         furhat.attend(user1)
-        furhat.say("Ciao, tu sarai il capo gruppo della squadra rossa, come ti chiami?")
+        furhat.say("Ciao, come ti chiami?")
         furhat.listen()
     }
     onResponse {
-        when (users.current.gameData.team) {
+        when (currentTeam) {
             TeamEnum.RED -> {
                 furhat.say("Ciao ${it.text}, tu sarai il capo gruppo della squadra rossa.")
-                user2.gameData.name = it.text
+                QuizGameManager.redLeader = UserData(user = user1, name = it.text, score = 0)
 
                 // Guarda user2 e chiedi il nome
+                currentTeam = TeamEnum.BLUE
                 furhat.attend(user2)
-                furhat.say("Ciao, tu sarai il capo gruppo della squadra blue, come ti chiami?")
+                furhat.say("Ciao, tu invece, come ti chiami?")
                 furhat.listen()
             }
 
             TeamEnum.BLUE -> {
-                furhat.say("Ciao ${it.text}, tu sarai il capo gruppo della squadra blue.")
-                user2.gameData.name = it.text
-                goto(QuizGame)
-            }
-
-            else -> {
-                furhat.say("Mi dispiace, c'è stato un errore.")
-                goto(Idle)
+                furhat.say("Ciao ${it.text}, tu sarai il capo gruppo della squadra blu.")
+                QuizGameManager.blueLeader = UserData(user = user2, name = it.text, score = 0)
+                goto(QuizGameInit)
             }
         }
     }
 }
 
-val QuizGame: State = state {
+val QuizGameInit: State = state {
     onEntry {
-        furhat.say("QUIZ STATE!")
+        send(
+            NewGameEvent(
+                redLeaderName = QuizGameManager.redLeader!!.name,
+                blueLeaderName = QuizGameManager.blueLeader!!.name,
+                maxRounds = QuizGameManager.maxRounds
+            )
+        )
+        // Aumento la distanza di engagement per il quiz
+        users.setSimpleEngagementPolicy(initEngagementDistance, initEngagementDistance, EngagementMaxUsersInGame)
+        furhat.say("Perfetto, iniziamo!")
+        goto(QuizGameNewQuestion)
     }
 }
 
+val QuizGameNewQuestion: State = state {
+    onEntry {
+        QuizGameManager.QuestionSet.next()
+        QuizGameManager.round++
+        QuizGameManager.nextTurn()
+        // send event to GUI
+        send(
+            SyncInformationEvent(
+                round = QuizGameManager.round,
+                redScore = QuizGameManager.redLeader!!.score,
+                blueScore = QuizGameManager.blueLeader!!.score,
+            )
+        )
+        delay(2000)
+        val currentTeamTurnString: String = when (QuizGameManager.currentTurnTeam) {
+            TeamEnum.RED -> "rossa"
+            TeamEnum.BLUE -> "blu"
+        }
+        furhat.attend(
+            when (QuizGameManager.currentTurnTeam) {
+                TeamEnum.RED -> QuizGameManager.redLeader!!.user
+                TeamEnum.BLUE -> QuizGameManager.blueLeader!!.user
+            }
+        )
+        furhat.say("Domanda per la squadra $currentTeamTurnString.")
+        goto(QuizGameAskQuestion)
+    }
+}
+
+val QuizGameAskQuestion: State = state {
+    onEntry {
+        val currentQ = QuizGameManager.QuestionSet.current
+        // send event to GUI
+        send(
+            AskQuestionEvent(
+                currentQ.question,
+                currentQ.options,
+                QuizGameManager.currentTurnTeam.toString(),
+                QuizGameManager.timeForQuestionTimeout
+            )
+        )
+        // Ask the question
+        furhat.say(currentQ.toQuestionTextSpeech())
+        furhat.say("Avvisatemi quando siete pronti.")
+        furhat.listen(timeout = QuizGameManager.timeForQuestionTimeout)
+    }
+    onTime(delay = QuizGameManager.timeForQuestionTimeout) {
+        furhat.say("Tempo scaduto!")
+        furhat.stopListening()
+        goto(QuizGameListenForAnswer)
+    }
+    onResponse<ImReady> {
+        goto(QuizGameListenForAnswer)
+    }
+    onResponse { furhat.listen(timeout = 30000) }
+    onNoResponse { furhat.listen(timeout = 30000) }
+}
+
+val QuizGameListenForAnswer: State = state {
+    onEntry {
+        furhat.say("Qual è la risposta?")
+        furhat.listen()
+    }
+    onResponse<AnswerOption> {
+        if (QuizGameManager.QuestionSet.current.isCorrect(it.text)) {
+            send(
+                QuestionAnswerEvent(
+                    it.text,
+                    QuizGameManager.QuestionSet.current.correctAnswer(),
+                    true
+                )
+            )
+            furhat.say("Risposta corretta!")
+            if (QuizGameManager.currentTurnTeam == TeamEnum.RED) {
+                QuizGameManager.redLeader!!.score++
+            } else {
+                QuizGameManager.blueLeader!!.score++
+            }
+        } else {
+            send(
+                QuestionAnswerEvent(
+                    it.text,
+                    QuizGameManager.QuestionSet.current.correctAnswer(),
+                    false
+                )
+            )
+            furhat.say("Risposta sbagliata!")
+        }
+        if (QuizGameManager.round < QuizGameManager.maxRounds) {
+            delay(1000)
+            goto(QuizGameNewQuestion)
+        } else {
+            goto(QuizGameEnd)
+        }
+    }
+    onResponse {
+        println(AnswerOption().getEnumItems(Language.ITALIAN))
+        furhat.say("Non ho capito.")
+        reentry()
+    }
+    onNoResponse {
+        reentry()
+    }
+}
+
+val QuizGameEnd: State = state {
+    onEntry {
+        send(
+            EndGameEvent(
+                redScore = QuizGameManager.redLeader!!.score,
+                blueScore = QuizGameManager.blueLeader!!.score,
+            )
+        )
+        furhat.say("Il gioco è finito!")
+    }
+}
 
 // frasi in attesa che i capo gruppi entrino
 val frasiAttesaCapoGruppi = listOf(

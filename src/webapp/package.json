@@ -10,9 +10,14 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@vueuse/core": "^10.11.0",
     "furhat-core": "^0.2.0",
     "furhat-gui": "^0.1.0",
     "nuxt": "^3.12.4",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "@vueuse/nuxt": "^10.11.0"
   }
 }
