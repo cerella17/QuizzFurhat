@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { gameData, currentQuestionData, questionCountDown, isGameRunning } = useFurhatData();
+const {gameData, currentQuestionData, questionCountDown, isGameRunning} = useFurhatData();
 
 // Stato per la gestione dell'animazione e del colore di sfondo
 const isSwitchingTeams = ref(false);
@@ -26,10 +26,6 @@ watch(() => gameData?.value?.round, (newRound) => {
     }, 1000); // Mostra il round per 1 secondo
   }
 });
-
-
-
-
 </script>
 
 <template>
@@ -43,7 +39,7 @@ watch(() => gameData?.value?.round, (newRound) => {
   <pre>{{ currentQuestionData }}</pre>
 
   <div class="flex items-center flex-col h-[90vh] bg-amber-500">
-    <img src="/public/images.png" class="absolute w-20 right-0">
+    <img src="/images.png" class="absolute w-20 right-0">
 
     <div v-if="isGameRunning && !currentQuestionData?.team"
          class="w-full flex items-center justify-center h-full">
@@ -86,16 +82,18 @@ watch(() => gameData?.value?.round, (newRound) => {
     </div>
 
     <div
-         class="w-full flex items-center justify-center h-full">
-      <h1  class="text-2xl">
+        class="w-full flex items-center justify-center h-full">
+      <h1 class="text-2xl">
         La partita è terminata...
       </h1>
     </div>
     <div v-if="gameData" class="flex flex-col items-center justify-center mt-5 ">
-      <h1 v-if="gameData?.red.score > gameData?.blue.score" class="text-2xl font-bold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg">
+      <h1 v-if="gameData?.red.score > gameData?.blue.score"
+          class="text-2xl font-bold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg">
         La squadra rossa ha vinto con uno score di {{ gameData?.red.score }}
       </h1>
-      <h1 v-else-if="gameData?.blue.score > gameData?.red.score" class="text-2xl font-bold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg">
+      <h1 v-else-if="gameData?.blue.score > gameData?.red.score"
+          class="text-2xl font-bold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg">
         La squadra blu ha vinto con uno score di {{ gameData?.blue.score }}
       </h1>
       <h1 v-else class="text-2xl font-bold my-4 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg">
@@ -173,14 +171,26 @@ watch(() => gameData?.value?.round, (newRound) => {
 }
 
 @keyframes correct {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes incorrect {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.9); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>
