@@ -85,7 +85,8 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
     onEntry {
         // Guarda user1 e chiedi il nome
         furhat.attend(user1)
-        furhat.ask("Ciao, come ti chiami?")
+        furhat.say("Ciao, come ti chiami?")
+        furhat.listen()
     }
     onResponse {
         when (currentTeam) {
@@ -96,7 +97,8 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
                 // Guarda user2 e chiedi il nome
                 currentTeam = TeamEnum.BLUE
                 furhat.attend(user2)
-                furhat.ask("Ciao, tu invece, come ti chiami?")
+                furhat.say("Ciao, tu invece, come ti chiami?")
+                furhat.listen()
             }
 
             TeamEnum.BLUE -> {
@@ -195,7 +197,8 @@ val QuizGameListenForAnswer: State = state {
                 TeamEnum.BLUE -> QuizGameManager.blueLeader!!.user
             }
         )
-        furhat.ask("Qual è la risposta?")
+        furhat.say("Qual è la risposta?")
+        furhat.listen()
     }
     onResponse<AnswerOption> {
         if (QuizGameManager.QuestionSet.current.isCorrect(it.text)) {
