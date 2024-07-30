@@ -18,7 +18,7 @@ val Init: State = state() {
         // Imposto la politica di engagement per l'interazione
         users.setSimpleEngagementPolicy(distance = initEngagementDistance, maxUsers = initEngagementMaxUsers)
         // Imposta la lingua in italiano
-        furhat.setInputLanguage(Language.ITALIAN)
+        furhat.setInputLanguage(Language.ITALIAN, Language.ENGLISH_US)
 
         // Host the GUI
         RemoteGUI("WEBAPP", port = 3000)
