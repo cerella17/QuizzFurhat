@@ -159,6 +159,7 @@ val QuizGameNewQuestion: State = state {
 val QuizGameAskQuestion: State = state {
     onEntry {
         val currentQ = QuizGameManager.QuestionSet.current
+        val questionText = currentQ.toQuestionTextSpeech()
         // send event to GUI
         send(
             AskQuestionEvent(
@@ -169,7 +170,7 @@ val QuizGameAskQuestion: State = state {
             )
         )
         // Ask the question
-        furhat.say(currentQ.toQuestionTextSpeech())
+        furhat.say(questionText)
         furhat.say("Avvisatemi quando siete pronti.")
         furhat.listen(timeout = QuizGameManager.timeForQuestionTimeout)
     }
