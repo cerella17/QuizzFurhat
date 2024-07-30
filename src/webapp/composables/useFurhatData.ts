@@ -8,7 +8,7 @@ export default function useFurhatData() {
     // undefined if no question is being asked
     const currentQuestionData = ref<IQuestionData>()
     // is game ended
-    const isGameEnded = ref(false)
+    const isGameRunning = ref(false)
 
     const questionCountDown = ref(0)
     const intervaller = useIntervalFn(() => {
@@ -21,6 +21,7 @@ export default function useFurhatData() {
     furhat.subscribe("NewGameEvent", (event) => {
         console.log(event.event_name, event)
         resetGame()
+        isGameRunning.value = true
         gameData.value = {
             round: 1,
             maxRounds: event.maxRounds,
@@ -69,13 +70,13 @@ export default function useFurhatData() {
         if (!gameData.value) return
         gameData.value.red.score = event.redScore
         gameData.value.blue.score = event.blueScore
-        isGameEnded.value = true
+        isGameRunning.value = false
     })
 
     function resetGame() {
         gameData.value = undefined
         currentQuestionData.value = undefined
-        isGameEnded.value = false
+        isGameRunning.value = false
         // stop the countdown
         intervaller.pause()
         questionCountDown.value = 0
@@ -85,6 +86,6 @@ export default function useFurhatData() {
         gameData,
         currentQuestionData,
         questionCountDown,
-        isGameEnded,
+        isGameRunning,
     }
 }

@@ -61,8 +61,10 @@ class Question(
             optionsJoinedString += options[i]
             optionsJoinedString += if (i < options.size - 2) {
                 ". "
-            } else {
+            } else if (i < options.size - 1) {
                 " oppure "
+            } else {
+                "."
             }
         }
         return "$question $optionsJoinedString"
