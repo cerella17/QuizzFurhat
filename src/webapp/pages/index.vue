@@ -27,7 +27,11 @@ watch(() => gameData?.value?.round, (newRound) => {
   }
 });
 </script>
-
+<!-- aggiungere stato per fine gioco
+    cambio squadre da rivedere
+    rivedere la scritta round 1, 2, ecc
+    quando far uscire gli score(dopo qualche secondo che è stato trasmesso lo stato finale?)
+ -->
 <template>
   <h1>Is Game Running: {{ isGameRunning }}</h1>
 
