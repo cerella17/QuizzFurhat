@@ -8,7 +8,6 @@ import furhatos.app.quiz.intents.ImReady
 import furhatos.app.quiz.setting.*
 import furhatos.flow.kotlin.*
 import furhatos.records.User
-import furhatos.util.Language
 import kotlin.random.Random
 
 // Stato iniziale
@@ -86,8 +85,7 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
     onEntry {
         // Guarda user1 e chiedi il nome
         furhat.attend(user1)
-        furhat.say("Ciao, come ti chiami?")
-        furhat.listen()
+        furhat.ask("Ciao, come ti chiami?")
     }
     onResponse {
         when (currentTeam) {
@@ -98,8 +96,7 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
                 // Guarda user2 e chiedi il nome
                 currentTeam = TeamEnum.BLUE
                 furhat.attend(user2)
-                furhat.say("Ciao, tu invece, come ti chiami?")
-                furhat.listen()
+                furhat.ask("Ciao, tu invece, come ti chiami?")
             }
 
             TeamEnum.BLUE -> {
@@ -159,6 +156,7 @@ val QuizGameNewQuestion: State = state {
 val QuizGameAskQuestion: State = state {
     onEntry {
         val currentQ = QuizGameManager.QuestionSet.current
+        val questionText = currentQ.toQuestionTextSpeech()
         // send event to GUI
         send(
             AskQuestionEvent(
@@ -169,8 +167,11 @@ val QuizGameAskQuestion: State = state {
             )
         )
         // Ask the question
-        furhat.say(currentQ.toQuestionTextSpeech())
+        furhat.say(questionText)
         furhat.say("Avvisatemi quando siete pronti.")
+
+        furhat.attendNobody()
+
         furhat.listen(timeout = QuizGameManager.timeForQuestionTimeout)
     }
     onTime(delay = QuizGameManager.timeForQuestionTimeout) {
@@ -187,8 +188,14 @@ val QuizGameAskQuestion: State = state {
 
 val QuizGameListenForAnswer: State = state {
     onEntry {
-        furhat.say("Qual è la risposta?")
-        furhat.listen()
+        // guardare il capo gruppo della squadra che deve rispondere
+        furhat.attend(
+            when (QuizGameManager.currentTurnTeam) {
+                TeamEnum.RED -> QuizGameManager.redLeader!!.user
+                TeamEnum.BLUE -> QuizGameManager.blueLeader!!.user
+            }
+        )
+        furhat.ask("Qual è la risposta?")
     }
     onResponse<AnswerOption> {
         if (QuizGameManager.QuestionSet.current.isCorrect(it.text)) {
@@ -223,7 +230,6 @@ val QuizGameListenForAnswer: State = state {
         }
     }
     onResponse {
-        println(AnswerOption().getEnumItems(Language.ITALIAN))
         furhat.say("Non ho capito.")
         reentry()
     }
@@ -234,6 +240,7 @@ val QuizGameListenForAnswer: State = state {
 
 val QuizGameEnd: State = state {
     onEntry {
+        furhat.attendNobody()
         send(
             EndGameEvent(
                 redScore = QuizGameManager.redLeader!!.score,
