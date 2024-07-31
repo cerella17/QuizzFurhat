@@ -1,68 +1,61 @@
 <script setup lang="ts">
-const {gameData, currentQuestionData, questionCountDown, isGameRunning} = useFurhatData();
 
-// Stato per la gestione dell'animazione e del colore di sfondo
-const isSwitchingTeams = ref(false);
-const showRound = ref(false);
+const {gameData, currentQuestionData, questionCountDown, isGameRunning, isGameEnded} = useFurhatData();
 
-function startSwitchTeams() {
-  isSwitchingTeams.value = true;
-  setTimeout(() => {
-    isSwitchingTeams.value = false;
-  }, 2000); // Durata dell'animazione in millisecondi
-}
+// Reactive state for controlling score display
+const showScore = ref(false);
 
-// Funzione per cambiare squadra (esempio di chiamata per dimostrare l'animazione)
-function changeTeam() {
-  startSwitchTeams();
-}
-
-// Watch per monitorare i cambiamenti nel round e mostrare il messaggio per un secondo
-watch(() => gameData?.value?.round, (newRound) => {
-  if (newRound) {
-    showRound.value = true;
+// Watch for changes in isGameEnded to trigger the timeout
+watch(isGameEnded, (newVal) => {
+  if (newVal) {
+    showScore.value = false;
     setTimeout(() => {
-      showRound.value = false;
-    }, 1000); // Mostra il round per 1 secondo
+      showScore.value = true;
+    }, 2000);
   }
 });
+
+
 </script>
-<!-- aggiungere stato per fine gioco
+<!--
     cambio squadre da rivedere
-    rivedere la scritta round 1, 2, ecc
-    quando far uscire gli score(dopo qualche secondo che è stato trasmesso lo stato finale?)
  -->
 <template>
-  <h1>Is Game Running: {{ isGameRunning }}</h1>
-
-  <h2>Game Data</h2>
-  <pre>{{ gameData }}</pre>
-
-  <h1>Countdown: {{ questionCountDown }}</h1>
-  <h2>Current Question Data</h2>
-  <pre>{{ currentQuestionData }}</pre>
-
-  <div class="flex items-center flex-col h-[90vh] bg-amber-500">
+  <div class="flex items-center flex-col  h-screen bg-amber-500 ">
     <img src="/images.png" class="absolute w-20 right-0">
 
+    <!--Icona caricamento -->
+    <div
+        v-if="!isGameRunning && !isGameEnded"
+        class="flex justify-center items-center h-full">
+      <Icon name="svg-spinners:6-dots-rotate" size="50"/>
+    </div>
+
+    <!-- La partita sta per iniziare -->
     <div v-if="isGameRunning && !currentQuestionData?.team"
-         class="w-full flex items-center justify-center h-full">
-      <h1 v-if="isGameRunning" class="text-2xl">
+         class="w-full flex items-center justify-center h-full"
+
+    >
+      <h1 class="text-2xl">
         La partita sta iniziando...
       </h1>
     </div>
-
-    <div v-if="currentQuestionData?.team"
-         :class="['flex items-center flex-col h-full justify-center gap-10 w-full', currentQuestionData?.team === 'BLUE' ? 'bg-blue' : 'bg-red']">
-      <div v-if="!currentQuestionData.question">
-        <h1 class="text-3xl">
-          Cambio Squadra
-        </h1>
-        <Icon :class="{'rotate-icon': isSwitchingTeams}" name="tabler:switch-horizontal" class="size-20"/>
-      </div>
-
-      <div v-if="currentQuestionData.question"
+    <!-- Domanda, opzioni, tempo e score-->
+    <div v-if="currentQuestionData?.team && !isGameEnded"
+         :class="['flex items-center flex-col h-full justify-center gap-10 w-full', currentQuestionData?.team === 'BLUE' ? 'bg-blue-800' : 'bg-red-800']">
+      <div
            class="flex flex-col justify-center items-center gap-4">
+        <!--Score -->
+        <div class="absolute top-1 left-1">
+          <h1 v-if="currentQuestionData.team == 'BLUE'"
+          class="text-3xl">
+            {{gameData?.blue.score}}
+          </h1>
+          <h1 v-else class="text-3xl"
+          >
+            {{gameData?.red.score}}
+          </h1>
+        </div>
         <div class="countdown-container flex items-center gap-2">
           <i class="fas fa-stopwatch text-3xl"></i>
           <h1 class="countdown">{{ questionCountDown }}</h1>
@@ -85,49 +78,34 @@ watch(() => gameData?.value?.round, (newRound) => {
       </div>
     </div>
 
-    <div
-        class="w-full flex items-center justify-center h-full">
-      <h1 class="text-2xl">
-        La partita è terminata...
-      </h1>˙
-    </div>
-    <div v-if="gameData" class="flex flex-col items-center justify-center mt-5 ">
-      <h1 v-if="gameData?.red.score > gameData?.blue.score"
-          class="text-2xl font-bold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg">
-        La squadra rossa ha vinto con uno score di {{ gameData?.red.score }}
-      </h1>
-      <h1 v-else-if="gameData?.blue.score > gameData?.red.score"
-          class="text-2xl font-bold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg">
-        La squadra blu ha vinto con uno score di {{ gameData?.blue.score }}
-      </h1>
-      <h1 v-else class="text-2xl font-bold my-4 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg">
-        La partita è finita in parità con uno score di {{ gameData?.red.score }} a {{ gameData?.blue.score }}
-      </h1>
+    <!--Partita terminata -->
+    <div v-if="isGameEnded" class="h-full"
+    >
+      <div
+          v-if="!showScore"
+          class="w-full flex items-center justify-center h-full  ">
+        <h1  class="text-2xl">
+          La partita è terminata...
+        </h1>
+      </div>
+      <div v-if="showScore && gameData" class="flex flex-col items-center justify-center mt-5 h-full">
+        <h1 v-if="gameData?.red.score > gameData?.blue.score"
+            class="text-2xl font-bold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg">
+          La squadra rossa ha vinto con uno score di {{ gameData?.red.score }}
+        </h1>
+        <h1 v-else-if="gameData?.blue.score > gameData?.red.score"
+            class="text-2xl font-bold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg">
+          La squadra blu ha vinto con uno score di {{ gameData?.blue.score }}
+        </h1>
+        <h1 v-else class="text-2xl font-bold my-4 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg">
+          La partita è finita in parità con uno score di {{ gameData?.red.score }} a {{ gameData?.blue.score }}
+        </h1>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.rotate-icon {
-  animation: rotate 2s linear infinite;
-}
-
-.bg-red {
-  background-color: red;
-}
-
-.bg-blue {
-  background-color: blue;
-}
 
 .countdown-container {
   display: flex;
@@ -156,14 +134,6 @@ watch(() => gameData?.value?.round, (newRound) => {
 
 .fa-stopwatch {
   color: #ff4500;
-}
-
-.bg-green-500 {
-  background-color: #38a169;
-}
-
-.bg-red-500 {
-  background-color: #e53e3e;
 }
 
 .animate-correct {

@@ -91,5 +91,6 @@ export default function useFurhatData() {
         currentQuestionData,
         questionCountDown,
         isGameRunning,
+        isGameEnded,
     }
 }
