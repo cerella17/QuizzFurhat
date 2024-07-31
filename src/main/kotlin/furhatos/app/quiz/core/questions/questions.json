@@ -25,5 +25,17 @@
       "Rewritable Access Memory",
       "Running Access Memory"
     ]
+  },
+  {
+    "question": "Quale animale è il simbolo di Linux?",
+    "answers": [
+      "Pinguino"
+    ],
+    "options": [
+      "Pinguino",
+      "Orso",
+      "Volpe",
+      "Gatto"
+    ]
   }
 ]

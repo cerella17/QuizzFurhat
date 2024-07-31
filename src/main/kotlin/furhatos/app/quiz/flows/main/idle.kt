@@ -11,7 +11,7 @@ import furhatos.app.quiz.setting.TeamEnum
 import furhatos.app.quiz.setting.initEngagementDistance
 import furhatos.flow.kotlin.*
 import furhatos.gestures.Gestures
-import furhatos.records.Location
+import furhatos.nlu.common.Yes
 import furhatos.records.User
 import kotlin.random.Random
 
@@ -130,6 +130,10 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
                 goto(QuizGameInit)
             }
         }
+    }
+    onNoResponse {
+        furhat.say("Non ho capito.")
+        furhat.listen()
     }
 }
 
@@ -272,6 +276,14 @@ val QuizGameListenForAnswer: State = state {
     }
     onResponse {
         furhat.say("Non ho capito.")
+        // guardare il capo gruppo della squadra che deve rispondere
+        furhat.attend(
+            when (QuizGameManager.currentTurnTeam) {
+                TeamEnum.RED -> QuizGameManager.redLeader!!.user
+                TeamEnum.BLUE -> QuizGameManager.blueLeader!!.user
+            }
+        )
+        furhat.listen()
         reentry()
     }
     onNoResponse {
@@ -297,6 +309,27 @@ val QuizGameEnd: State = state {
             )
         }
         furhat.say("Il gioco è finito!")
+        if (QuizGameManager.redLeader!!.score > QuizGameManager.blueLeader!!.score) {
+            furhat.say("La squadra rossa ha vinto!")
+        } else if (QuizGameManager.redLeader!!.score < QuizGameManager.blueLeader!!.score) {
+            furhat.say("La squadra blu ha vinto!")
+        } else {
+            furhat.say("Pareggio!")
+        }
+
+        // re-game
+        furhat.say("Volete giocare ancora?")
+        furhat.listen()
+    }
+    onResponse<Yes> {
+        QuizGameManager.resetGame()
+        goto(QuizGameInit)
+    }
+    onResponse {
+        furhat.say("Arrivederci!")
+    }
+    onNoResponse {
+        furhat.say("Arrivederci!")
     }
 }
 
