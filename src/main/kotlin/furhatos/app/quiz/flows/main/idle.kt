@@ -5,15 +5,30 @@ import furhatos.app.quiz.core.UserData
 import furhatos.app.quiz.events.*
 import furhatos.app.quiz.intents.AnswerOption
 import furhatos.app.quiz.intents.ImReady
-import furhatos.app.quiz.setting.*
+import furhatos.app.quiz.setting.EngagementDistanceInGame
+import furhatos.app.quiz.setting.EngagementMaxUsersInGame
+import furhatos.app.quiz.setting.TeamEnum
+import furhatos.app.quiz.setting.initEngagementDistance
 import furhatos.flow.kotlin.*
+import furhatos.gestures.Gestures
+import furhatos.records.Location
 import furhatos.records.User
 import kotlin.random.Random
 
 // Stato iniziale
 val Idle: State = state {
     onEntry {
-        // TODO: OnEntry if someone is visible, greet them
+        if (users.count >= 1) {
+            furhat.attend(users.random)
+            furhat.say("Ciao!")
+        }
+
+        // If there are more than 2 users, say that Furhat is ready to start the quiz
+        if (users.count >= 2) {
+            furhat.say("Ciao a tutti! Sono pronto per iniziare il quiz.")
+            furhat.say("Ditemi quando siete pronti.")
+            furhat.listen()
+        }
     }
     onUserEnter {
         // TODO: OnUserEnter, glance and greet them
@@ -40,7 +55,8 @@ val Idle: State = state {
             { furhat.say("Sono pronto, ditemi quando siete pronti!", async = true) },
             { furhat.say("Sono qui, ditemi quando siete pronti!", async = true) }
         )
-        furhat.listen()
+        if (users.count >= 2)
+            furhat.listen()
     }
 }
 
@@ -50,9 +66,18 @@ val ExplainRules: State = state {
         users.setSimpleEngagementPolicy(EngagementDistanceInGame, EngagementDistanceInGame, EngagementMaxUsersInGame)
 
         // TODO: Tell them the rules of the quiz
-
+        furhat.say {
+            +glance(users.random, duration = 20000)
+            +"Benvenuti al quiz! Vi farò ${QuizGameManager.maxRounds} domande a scelta multipla."
+            +glance(users.random, duration = 20000)
+            +"Ogni domanda avrà diverse opzioni di risposta. Dovrete scegliere quella corretta."
+            +glance(users.random, duration = 20000)
+            +"In caso di risposta corretta, la rispettiva squadra guadagnerà un punto."
+            +glance(users.random, duration = 20000)
+            +"Avrete ${QuizGameManager.timeForQuestionTimeout / 1000} secondi per discutere con la vostra squadra prima di dare la risposta."
+            +glance(users.random, duration = 20000)
+        }
         furhat.say("Ok, iniziamo!")
-
         goto(PreQuiz)
     }
 }
@@ -65,13 +90,11 @@ val PreQuiz: State = state {
             furhat.say(frasiAttesaCapoGruppi[Random.nextInt(frasiAttesaCapoGruppi.size - 1)])
             delay(2000) // Aspetta un po' prima di controllare di nuovo
         }
-
         // Gestisci il caso in cui ci sono più persone nel range
         while (users.count > 2) {
             furhat.say(frasiTroppePersone[Random.nextInt(frasiTroppePersone.size)])
             delay(2000)
         }
-
         // Assegna le squadre
         if (users.list.size != 2)
             reentry()
@@ -112,13 +135,15 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
 
 val QuizGameInit: State = state {
     onEntry {
-        send(
-            NewGameEvent(
-                redLeaderName = QuizGameManager.redLeader!!.name,
-                blueLeaderName = QuizGameManager.blueLeader!!.name,
-                maxRounds = QuizGameManager.maxRounds
+        parallel {
+            send(
+                NewGameEvent(
+                    redLeaderName = QuizGameManager.redLeader!!.name,
+                    blueLeaderName = QuizGameManager.blueLeader!!.name,
+                    maxRounds = QuizGameManager.maxRounds
+                )
             )
-        )
+        }
         // Aumento la distanza di engagement per il quiz
         users.setSimpleEngagementPolicy(initEngagementDistance, initEngagementDistance, EngagementMaxUsersInGame)
         furhat.say("Perfetto, iniziamo!")
@@ -132,13 +157,16 @@ val QuizGameNewQuestion: State = state {
         QuizGameManager.round++
         QuizGameManager.nextTurn()
         // send event to GUI
-        send(
-            SyncInformationEvent(
-                round = QuizGameManager.round,
-                redScore = QuizGameManager.redLeader!!.score,
-                blueScore = QuizGameManager.blueLeader!!.score,
+        parallel {
+            send(
+                SyncInformationEvent(
+                    round = QuizGameManager.round,
+                    redScore = QuizGameManager.redLeader!!.score,
+                    blueScore = QuizGameManager.blueLeader!!.score,
+                )
             )
-        )
+        }
+
         delay(2000)
         val currentTeamTurnString: String = when (QuizGameManager.currentTurnTeam) {
             TeamEnum.RED -> "rossa"
@@ -160,14 +188,17 @@ val QuizGameAskQuestion: State = state {
         val currentQ = QuizGameManager.QuestionSet.current
         val questionText = currentQ.toQuestionTextSpeech()
         // send event to GUI
-        send(
-            AskQuestionEvent(
-                currentQ.question,
-                currentQ.options,
-                QuizGameManager.currentTurnTeam.toString(),
-                QuizGameManager.timeForQuestionTimeout
+        parallel {
+            send(
+                AskQuestionEvent(
+                    currentQ.question,
+                    currentQ.options,
+                    QuizGameManager.currentTurnTeam.toString(),
+                    QuizGameManager.timeForQuestionTimeout
+                )
             )
-        )
+        }
+
         // Ask the question
         furhat.say(questionText)
         furhat.say("Avvisatemi quando siete pronti.")
@@ -202,13 +233,16 @@ val QuizGameListenForAnswer: State = state {
     }
     onResponse<AnswerOption> {
         if (QuizGameManager.QuestionSet.current.isCorrect(it.text)) {
-            send(
-                QuestionAnswerEvent(
-                    it.text,
-                    QuizGameManager.QuestionSet.current.correctAnswer(),
-                    true
+            parallel {
+                send(
+                    QuestionAnswerEvent(
+                        it.text,
+                        QuizGameManager.QuestionSet.current.correctAnswer(),
+                        true
+                    )
                 )
-            )
+            }
+
             furhat.say("Risposta corretta!")
             if (QuizGameManager.currentTurnTeam == TeamEnum.RED) {
                 QuizGameManager.redLeader!!.score++
@@ -216,14 +250,18 @@ val QuizGameListenForAnswer: State = state {
                 QuizGameManager.blueLeader!!.score++
             }
         } else {
-            send(
-                QuestionAnswerEvent(
-                    it.text,
-                    QuizGameManager.QuestionSet.current.correctAnswer(),
-                    false
+            furhat.gesture(Gestures.BrowFrown)
+            parallel {
+                send(
+                    QuestionAnswerEvent(
+                        it.text,
+                        QuizGameManager.QuestionSet.current.correctAnswer(),
+                        false
+                    )
                 )
-            )
-            furhat.say("Risposta sbagliata!")
+            }
+            // frasi di risposta sbagliata
+            furhat.say(frasiRispostaSbagliata[Random.nextInt(frasiRispostaSbagliata.size - 1)])
         }
         if (QuizGameManager.round < QuizGameManager.maxRounds) {
             delay(1000)
@@ -237,19 +275,27 @@ val QuizGameListenForAnswer: State = state {
         reentry()
     }
     onNoResponse {
-        reentry()
+        furhat.say(frasiTroppoLento[Random.nextInt(frasiTroppoLento.size - 1)])
+        if (QuizGameManager.round < QuizGameManager.maxRounds) {
+            delay(1000)
+            goto(QuizGameNewQuestion)
+        } else {
+            goto(QuizGameEnd)
+        }
     }
 }
 
 val QuizGameEnd: State = state {
     onEntry {
         furhat.attendNobody()
-        send(
-            EndGameEvent(
-                redScore = QuizGameManager.redLeader!!.score,
-                blueScore = QuizGameManager.blueLeader!!.score,
+        parallel {
+            send(
+                EndGameEvent(
+                    redScore = QuizGameManager.redLeader!!.score,
+                    blueScore = QuizGameManager.blueLeader!!.score,
+                )
             )
-        )
+        }
         furhat.say("Il gioco è finito!")
     }
 }
@@ -276,4 +322,37 @@ val frasiTroppePersone = listOf(
     "Solo i capi gruppi devono rimanere, gli altri per favore si allontanino.",
     "Per favore, chi non è capo gruppo faccia un passo indietro.",
     "Solo i capi gruppi possono rimanere vicini, gli altri si allontanino."
+)
+
+// frasi di risposta sbagliata
+val frasiRispostaSbagliata = listOf(
+    "Oh no, risposta sbagliata! Ma non ti preoccupare, succede!",
+    "Purtroppo no, questa non è la risposta giusta. Ritenta!",
+    "Ops! Non è corretto. Ma sei sempre un campione per averci provato!",
+    "Oh oh, risposta sbagliata! Ma va bene così, continua a giocare!",
+    "Quasi! Ma non ci siamo. Non arrenderti!",
+    "Non è corretto! Ma chi non prova non sbaglia!",
+    "Eh no, non è giusto. Ma sei sulla strada giusta, continua così!",
+    "Niente da fare, risposta sbagliata. Ma sei qui per divertirti, giusto?",
+    "Ahimè, questa non è la risposta giusta. Ma va bene, la prossima volta andrà meglio!",
+    "Nope, non è corretto. Ma il divertimento è nel giocare!",
+    "Sbagliato! Hai per caso bisogno di un caffè?",
+    "Oh no, hai sbagliato! Stai giocando con la testa o con i piedi?",
+    "Ops, risposta sbagliata. Forse dovresti chiedere aiuto a Google!",
+    "Non è giusto! Hai studiato su Wikipedia?",
+    "Ahia, risposta sbagliata. Hai dormito durante le lezioni?"
+)
+
+// frasi per quando il capo gruppo è troppo lento a rispondere
+val frasiTroppoLento = listOf(
+    "Troppo lento! Ecco la prossima domanda",
+    "Un po' troppo lento! Preparati per la prossima domanda",
+    "Devi essere più veloce! Passiamo alla prossima domanda",
+    "Risposta non pervenuta. Passiamo oltre",
+    "Nessuna risposta! Prossima domanda in arrivo",
+    "Troppo tempo per rispondere. Passiamo alla prossima domanda",
+    "Non hai risposto in tempo. Ecco la prossima domanda",
+    "Sei stato troppo lento! Prossima domanda",
+    "Risposta non ricevuta. Prossima domanda",
+    "Nessuna risposta registrata. Passiamo alla prossima domanda"
 )
