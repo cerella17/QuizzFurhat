@@ -89,7 +89,7 @@ watch(() => gameData?.value?.round, (newRound) => {
         class="w-full flex items-center justify-center h-full">
       <h1 class="text-2xl">
         La partita è terminata...
-      </h1>
+      </h1>˙
     </div>
     <div v-if="gameData" class="flex flex-col items-center justify-center mt-5 ">
       <h1 v-if="gameData?.red.score > gameData?.blue.score"

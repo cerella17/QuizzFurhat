@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
     "@nuxt/icon": "^1.4.0",
     "@vueuse/core": "^10.11.0",
     "furhat-core": "^0.2.0",

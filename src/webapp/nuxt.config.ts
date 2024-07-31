@@ -13,7 +13,7 @@ export default defineNuxtConfig({
         }
     },
 
-    modules: ['@nuxtjs/tailwindcss', '@vueuse/nuxt', "@nuxt/icon"],
+    modules: ['@nuxtjs/tailwindcss', '@vueuse/nuxt', "@nuxt/icon", "@formkit/auto-animate/nuxt"],
     icon: {
         serverBundle: "remote"
     }
