@@ -268,6 +268,7 @@ val QuizGameListenForAnswer: State = state {
             furhat.say(frasiRispostaSbagliata[Random.nextInt(frasiRispostaSbagliata.size - 1)])
         }
         if (QuizGameManager.round < QuizGameManager.maxRounds) {
+            furhat.attendNobody()
             delay(1000)
             goto(QuizGameNewQuestion)
         } else {
