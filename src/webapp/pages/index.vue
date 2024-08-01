@@ -55,17 +55,26 @@ const haDettoUnaPresente = computed(
     >
       <div class="flex flex-col justify-center items-center gap-4">
         <!--Score -->
-        <div class="absolute top-1 left-1">
-          <h1 v-if="gameData?.red.leaderName != gameData?.blue.leaderName" class="text-3xl">
-            {{ gameData?.blue.leaderName }}:
-            {{ gameData?.blue.score }}
+        <div
+            v-if="gameData?.red.leaderName != gameData?.blue.leaderName"
+            class="absolute bottom-1 justify-between left-1 flex w-full px-2">
+          <h1  class="text-3xl">
+
             {{ gameData?.red.leaderName }}:
             {{ gameData?.red.score }}
           </h1>
-          <h1 v-else class="text-3xl">
-            Squadra Blu: {{ gameData?.blue.score }} Squadra Rossa : {{ gameData?.red.score }}
-          </h1>
+          <h1 class="text-3xl"> {{ gameData?.blue.leaderName }}:
+            {{ gameData?.blue.score }}</h1>
         </div>
+        <div
+            v-else
+            class="absolute bottom-1 justify-between left-1">
+          <h1  class="text-3xl">
+            Squadra Rossa : {{ gameData?.red.score }}
+          </h1>
+          <h1>Squadra Blu: {{ gameData?.blue.score }} </h1>
+        </div>
+
         <div class="countdown-container flex items-center gap-2">
           <i class="fas fa-stopwatch text-3xl"></i>
           <h1 class="countdown md:text-4xl">{{ questionCountDown }}</h1>
