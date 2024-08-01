@@ -246,7 +246,10 @@ val QuizGameListenForAnswer: State = state {
                     )
                 )
             }
-
+            random(
+                { furhat.gesture(Gestures.Surprise, async = true) },
+                { furhat.gesture(Gestures.BigSmile, async = true) }
+            )
             furhat.say("Risposta corretta!")
             if (QuizGameManager.currentTurnTeam == TeamEnum.RED) {
                 QuizGameManager.redLeader!!.score++
@@ -254,7 +257,6 @@ val QuizGameListenForAnswer: State = state {
                 QuizGameManager.blueLeader!!.score++
             }
         } else {
-            furhat.gesture(Gestures.BrowFrown)
             parallel {
                 send(
                     QuestionAnswerEvent(
@@ -264,6 +266,11 @@ val QuizGameListenForAnswer: State = state {
                     )
                 )
             }
+            random(
+                { furhat.gesture(Gestures.Shake, async = true) },
+                { furhat.gesture(Gestures.ExpressFear, async = true) },
+                { furhat.gesture(Gestures.ExpressSad, async = true) }
+            )
             // frasi di risposta sbagliata
             furhat.say(frasiRispostaSbagliata[Random.nextInt(frasiRispostaSbagliata.size - 1)])
         }

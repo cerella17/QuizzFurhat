@@ -8,6 +8,8 @@ import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.state
 import furhatos.flow.kotlin.users
 import furhatos.flow.kotlin.voice.Voice
+import furhatos.gestures.Gesture
+import furhatos.gestures.Gestures
 import furhatos.skills.RemoteGUI
 import furhatos.util.Language
 
