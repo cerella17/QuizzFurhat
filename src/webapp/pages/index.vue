@@ -56,20 +56,14 @@ const haDettoUnaPresente = computed(
       <div class="flex flex-col justify-center items-center gap-4">
         <!--Score -->
         <div class="absolute top-1 left-1">
-          <h1
-              v-if="gameData?.red.leaderName != gameData?.blue.leaderName"
-              class="text-3xl">
-            {{gameData?.blue.leaderName}}:
-            {{gameData?.blue.score}}
-            {{gameData?.red.leaderName}}:
-            {{gameData?.red.score}}
+          <h1 v-if="gameData?.red.leaderName != gameData?.blue.leaderName" class="text-3xl">
+            {{ gameData?.blue.leaderName }}:
+            {{ gameData?.blue.score }}
+            {{ gameData?.red.leaderName }}:
+            {{ gameData?.red.score }}
           </h1>
-          <h1
-              v-else
-              class="text-3xl"
-          >
-            Squadra Blu: {{gameData?.blue.score}}
-            Squadra Rossa : {{gameData?.red.score}}
+          <h1 v-else class="text-3xl">
+            Squadra Blu: {{ gameData?.blue.score }} Squadra Rossa : {{ gameData?.red.score }}
           </h1>
         </div>
         <div class="countdown-container flex items-center gap-2">
@@ -85,13 +79,12 @@ const haDettoUnaPresente = computed(
               :key="index"
               class="option border p-2 text-center rounded-lg bg-transparent md:py-4 md:text-2xl"
               :class="[
-                haDettoUnaPresente &&
-                currentQuestionData.result &&
-                currentQuestionData.result.correctAnswer.toLowerCase() === option.toLowerCase()
+                currentQuestionData.result?.correctAnswer.toLowerCase() === option.toLowerCase()
                   ? '!bg-green-500 animate-correct'
-                  : haDettoUnaPresente === false ||
+                  : (haDettoUnaPresente === false &&
+                      currentQuestionData.result?.correct === false) ||
                     currentQuestionData.result?.answer.toLowerCase() === option.toLowerCase()
-                  ? 'bg-red-500 animate-incorrect'
+                  ? '!bg-red-500 animate-incorrect'
                   : '',
               ]"
             >
