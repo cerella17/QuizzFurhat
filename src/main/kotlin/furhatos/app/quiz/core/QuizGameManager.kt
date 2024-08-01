@@ -20,9 +20,9 @@ object QuizGameManager {
     }
 
     fun resetGame() {
-        redLeader = null
-        blueLeader = null
-        currentTurnTeam = TeamEnum.RED
+        redLeader?.score = 0
+        blueLeader?.score = 0
+        currentTurnTeam = TeamEnum.BLUE
         round = 0
     }
 }
