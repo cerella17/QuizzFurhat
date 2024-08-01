@@ -74,15 +74,16 @@ const haDettoUnaPresente = computed(
         </div>
         <div class="countdown-container flex items-center gap-2">
           <i class="fas fa-stopwatch text-3xl"></i>
-          <h1 class="countdown">{{ questionCountDown }}</h1>
+          <h1 class="countdown md:text-4xl">{{ questionCountDown }}</h1>
         </div>
-        <div class="question-container">
+
+        <div class="question-container md:text-4xl">
           <h1>{{ currentQuestionData?.question }}</h1>
           <div class="grid grid-cols-2 gap-4 mt-4">
             <div
               v-for="(option, index) in currentQuestionData.options"
               :key="index"
-              class="option border p-2 text-center rounded-lg bg-transparent"
+              class="option border p-2 text-center rounded-lg bg-transparent md:py-4 md:text-2xl"
               :class="[
                 haDettoUnaPresente &&
                 currentQuestionData.result &&
