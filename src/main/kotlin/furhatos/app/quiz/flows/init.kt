@@ -1,5 +1,6 @@
 package furhatos.app.quiz.flows
 
+import furhatos.app.quiz.flows.main.Idle
 import furhatos.app.quiz.flows.main.PreQuiz
 import furhatos.app.quiz.setting.initEngagementDistance
 import furhatos.app.quiz.setting.initEngagementMaxUsers
@@ -25,6 +26,6 @@ val Init: State = state() {
         // Host the GUI
         RemoteGUI("WEBAPP", port = 3000)
 
-        goto(PreQuiz)
+        goto(Idle)
     }
 }
