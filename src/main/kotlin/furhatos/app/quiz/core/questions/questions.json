@@ -15,15 +15,15 @@
     ]
   },
   {
-    "question": "Cosa significa RAM?",
+    "question": "Quale dei seguenti non è un sistema operativo?",
     "answers": [
-      "Random Access Memory"
+      "Intel"
     ],
     "options": [
-      "Read Access Memory",
-      "Random Access Memory",
-      "Rewritable Access Memory",
-      "Running Access Memory"
+      "Windows",
+      "Linux",
+      "MacOS",
+      "Intel"
     ]
   },
   {
@@ -39,19 +39,17 @@
     ]
   },
   {
-    "question": "Quale delle seguenti descrive meglio il concetto di \"pipeline\" in un processore?",
+    "question": "Quale dei seguenti non è un linguaggio di programmazione?",
     "answers": [
-      "A. La pipeline suddivide l'esecuzione delle istruzioni in diverse fasi, permettendo l'elaborazione simultanea di più istruzioni per aumentare il throughput.",
-      "la A",
-      "A",
-      "la prima",
-      "la pipeline suddivide"
+      "Windows",
+      "W I N D O W S",
+      "Window"
     ],
     "options": [
-      "A. La pipeline suddivide l'esecuzione delle istruzioni in diverse fasi, permettendo l'elaborazione simultanea di più istruzioni per aumentare il throughput.",
-      "B. La pipeline consente ai processori di eseguire più thread contemporaneamente utilizzando core separati per ottimizzare le risorse.",
-      "C. La pipeline è un sistema di memorizzazione temporanea che permette di mantenere i dati in attesa di essere processati.",
-      "D. La pipeline è un sistema di memorizzazione temporanea che permette di mantenere i dati in attesa di essere processati."
+      "Java",
+      "Python",
+      "C++",
+      "Windows"
     ]
   }
 ]

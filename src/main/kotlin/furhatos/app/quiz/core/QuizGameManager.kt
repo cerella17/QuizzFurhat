@@ -12,7 +12,7 @@ object QuizGameManager {
     var round: Int = 0
 
     // editable
-    var maxRounds: Int = 3
+    var maxRounds: Int = 4
     var timeForQuestionTimeout: Int = 30000 // in ms
 
     fun nextTurn() {
