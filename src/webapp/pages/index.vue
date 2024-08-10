@@ -25,9 +25,7 @@ const haDettoUnaPresente = computed(
       .includes(currentQuestionData.value.result.answer.toLowerCase())
 )
 </script>
-<!--
-    cambio squadre da rivedere
- -->
+
 <template>
   <div class="flex items-center flex-col h-screen bg-amber-500" v-auto-animate>
     <img src="/images.png" class="absolute w-20 right-0" alt="img unisa" />
@@ -45,6 +43,20 @@ const haDettoUnaPresente = computed(
       <h1 class="text-2xl">La partita sta iniziando...</h1>
     </div>
 
+    <!--Saluta i Capo squadra -->
+    <div
+
+        class="w-full flex items-center justify-center h-full">
+    Ciao {{gameData?.red.leaderName}}
+    </div>
+    <div
+
+        class="w-full flex items-center justify-center h-full">
+      Ciao {{gameData?.blue.leaderName}}
+    </div>
+    <div class="w-full flex items-center justify-center h-full">
+      <p class="text-xl font-semibold mt-4">Buon divertimento {{gameData?.red.leaderName}} e {{gameData?.blue.leaderName}} che vinca la squadra migliore!</p>
+    </div>
     <!-- Domanda, opzioni, tempo e score-->
     <div
       v-if="currentQuestionData?.team && !isGameEnded"
