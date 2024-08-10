@@ -32,6 +32,10 @@ interface IEvents {
         redScore: number,
         blueScore: number,
     }
+    GreetingLeaderEvent: {
+        team: "RED" | "BLUE",
+        name: string
+    }
 }
 
 interface IBaseEvent {

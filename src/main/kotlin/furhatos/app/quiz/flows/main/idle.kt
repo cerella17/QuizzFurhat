@@ -18,6 +18,7 @@ import kotlin.random.Random
 // Stato iniziale
 val Idle: State = state {
     onEntry {
+        furhat.attendNobody()
         if (users.count >= 1) {
             furhat.attend(users.random)
             furhat.say("Ciao!")
@@ -114,6 +115,14 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
     onResponse {
         when (currentTeam) {
             TeamEnum.RED -> {
+                parallel {
+                    send(
+                        GreetingLeaderEvent(
+                            team = "RED",
+                            name = it.text
+                        )
+                    )
+                }
                 furhat.say("Ciao ${it.text}, tu sarai il capo gruppo della squadra rossa.")
                 QuizGameManager.redLeader = UserData(user = user1, name = it.text, score = 0)
 
@@ -125,6 +134,14 @@ fun assignTeamToLeaders(user1: User, user2: User) = state {
             }
 
             TeamEnum.BLUE -> {
+                parallel {
+                    send(
+                        GreetingLeaderEvent(
+                            team = "BLUE",
+                            name = it.text
+                        )
+                    )
+                }
                 furhat.say("Ciao ${it.text}, tu sarai il capo gruppo della squadra blu.")
                 QuizGameManager.blueLeader = UserData(user = user2, name = it.text, score = 0)
                 goto(QuizGameInit)

@@ -12,6 +12,11 @@ export default function useFurhatData() {
     // is game ended
     const isGameEnded = ref(false)
 
+    const greetingLeader = ref<{
+        team: "RED" | "BLUE"
+        name: string
+    } | null>(null)
+
     const questionCountDown = ref(0)
     const intervaller = useIntervalFn(() => {
         questionCountDown.value--
@@ -20,6 +25,13 @@ export default function useFurhatData() {
         }
     }, 1000, {immediate: false})
 
+    furhat.subscribe("GreetingLeaderEvent", (event) => {
+        console.log(event.event_name, event)
+        greetingLeader.value = {
+            team: event.team,
+            name: event.name
+        }
+    })
     furhat.subscribe("NewGameEvent", (event) => {
         console.log(event.event_name, event)
         resetGame()
@@ -79,6 +91,7 @@ export default function useFurhatData() {
     function resetGame() {
         gameData.value = undefined
         currentQuestionData.value = undefined
+        greetingLeader.value = null
         isGameRunning.value = false
         isGameEnded.value = false
         // stop the countdown
@@ -92,5 +105,6 @@ export default function useFurhatData() {
         questionCountDown,
         isGameRunning,
         isGameEnded,
+        greetingLeader,
     }
 }

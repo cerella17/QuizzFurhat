@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { vAutoAnimate } from "@formkit/auto-animate"
+import {vAutoAnimate} from "@formkit/auto-animate"
 
-const { gameData, currentQuestionData, questionCountDown, isGameRunning, isGameEnded } =
-  useFurhatData()
+const {gameData, currentQuestionData, questionCountDown, isGameRunning, isGameEnded, greetingLeader} =
+    useFurhatData()
 
 // Reactive state for controlling score display
 const showScore = ref(false)
@@ -18,49 +18,53 @@ watch(isGameEnded, (newVal) => {
 })
 
 const haDettoUnaPresente = computed(
-  () =>
-    currentQuestionData.value?.result &&
-    currentQuestionData.value?.options
-      .map((x) => x.toLocaleLowerCase())
-      .includes(currentQuestionData.value.result.answer.toLowerCase())
+    () =>
+        currentQuestionData.value?.result &&
+        currentQuestionData.value?.options
+            .map((x) => x.toLocaleLowerCase())
+            .includes(currentQuestionData.value.result.answer.toLowerCase())
 )
 </script>
 
 <template>
   <div class="flex items-center flex-col h-screen bg-amber-500" v-auto-animate>
-    <img src="/images.png" class="absolute w-20 right-0" alt="img unisa" />
+    <img src="/images.png" class="absolute w-20 right-0" alt="img unisa"/>
 
     <!--Icona caricamento -->
-    <div v-if="!isGameRunning && !isGameEnded" class="flex justify-center items-center h-full">
-      <Icon name="svg-spinners:6-dots-rotate" size="50" />
+    <div v-if="(!isGameRunning && !isGameEnded) && !greetingLeader" class="flex justify-center items-center h-full">
+      <Icon name="svg-spinners:6-dots-rotate" size="50"/>
     </div>
 
     <!-- La partita sta per iniziare -->
     <div
-      v-if="isGameRunning && !currentQuestionData?.team"
-      class="w-full flex items-center justify-center h-full"
+        v-if="isGameRunning && !currentQuestionData?.team"
+        class="w-full flex flex-col gap-2 items-center justify-center h-full"
     >
       <h1 class="text-2xl">La partita sta iniziando...</h1>
+      <div class="bg-green-100 text-green-600 rounded-lg px-8 py-4 text-xl font-semibold mt-4 shadow-lg text-center">
+        🌟 Buon divertimento, {{ gameData?.red.leaderName }} e {{ gameData?.blue.leaderName }}!
+        <br>
+        Che vinca la squadra migliore! 🌟
+      </div>
     </div>
 
     <!--Saluta i Capo squadra -->
     <!-- Saluta i Capo squadra -->
-    <div class="w-full flex flex-col items-center justify-center h-full space-y-4">
-      <div class="bg-red-100 text-red-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
-        🎉 Ciao {{gameData?.red.leaderName}}! 🎉
+    <div v-if="greetingLeader" class="w-full flex flex-col items-center justify-center h-full space-y-4">
+      <div v-if="greetingLeader.team==='RED'"
+           class="bg-red-100 text-red-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
+        🎉 Ciao {{ greetingLeader.name }}! 🎉
       </div>
-      <div class="bg-blue-100 text-blue-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
-        🎉 Ciao {{gameData?.blue.leaderName}}! 🎉
-      </div>
-      <div class="bg-green-100 text-green-600 rounded-lg px-8 py-4 text-xl font-semibold mt-4 shadow-lg text-center">
-        🌟 Buon divertimento, {{gameData?.red.leaderName}} e {{gameData?.blue.leaderName}}! <br>Che vinca la squadra migliore! 🌟
+      <div v-if="greetingLeader.team==='BLUE'"
+           class="bg-blue-100 text-blue-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
+        🎉 Ciao {{ greetingLeader.name }}! 🎉
       </div>
     </div>
 
     <!-- Domanda, opzioni, tempo e score-->
     <div
-      v-if="currentQuestionData?.team && !isGameEnded"
-      :class="[
+        v-if="currentQuestionData?.team && !isGameEnded"
+        :class="[
         'flex items-center flex-col h-full justify-center gap-10 w-full',
         currentQuestionData?.team === 'BLUE' ? 'bg-blue-800' : 'bg-red-600',
       ]"
@@ -70,7 +74,7 @@ const haDettoUnaPresente = computed(
         <div
             v-if="gameData?.red.leaderName != gameData?.blue.leaderName"
             class="absolute bottom-1 justify-between left-1 flex w-full px-2">
-          <h1  class="text-3xl">
+          <h1 class="text-3xl">
 
             {{ gameData?.red.leaderName }}:
             {{ gameData?.red.score }}
@@ -81,7 +85,7 @@ const haDettoUnaPresente = computed(
         <div
             v-else
             class="absolute bottom-1 justify-between left-1">
-          <h1  class="text-3xl">
+          <h1 class="text-3xl">
             Squadra Rossa : {{ gameData?.red.score }}
           </h1>
           <h1>Squadra Blu: {{ gameData?.blue.score }} </h1>
@@ -96,10 +100,10 @@ const haDettoUnaPresente = computed(
           <h1>{{ currentQuestionData?.question }}</h1>
           <div class="grid grid-cols-2 gap-4 mt-4">
             <div
-              v-for="(option, index) in currentQuestionData.options"
-              :key="index"
-              class="option border p-2 text-center rounded-lg bg-transparent md:py-4 md:text-2xl"
-              :class="[
+                v-for="(option, index) in currentQuestionData.options"
+                :key="index"
+                class="option border p-2 text-center rounded-lg bg-transparent md:py-4 md:text-2xl"
+                :class="[
                 currentQuestionData.result?.correctAnswer.toLowerCase() === option.toLowerCase()
                   ? '!bg-green-500 animate-correct'
                   : (haDettoUnaPresente === false &&
