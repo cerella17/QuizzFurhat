@@ -44,19 +44,19 @@ const haDettoUnaPresente = computed(
     </div>
 
     <!--Saluta i Capo squadra -->
-    <div
+    <!-- Saluta i Capo squadra -->
+    <div class="w-full flex flex-col items-center justify-center h-full space-y-4">
+      <div class="bg-red-100 text-red-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
+        🎉 Ciao {{gameData?.red.leaderName}}! 🎉
+      </div>
+      <div class="bg-blue-100 text-blue-600 rounded-full px-6 py-3 text-2xl font-bold shadow-md">
+        🎉 Ciao {{gameData?.blue.leaderName}}! 🎉
+      </div>
+      <div class="bg-green-100 text-green-600 rounded-lg px-8 py-4 text-xl font-semibold mt-4 shadow-lg text-center">
+        🌟 Buon divertimento, {{gameData?.red.leaderName}} e {{gameData?.blue.leaderName}}! <br>Che vinca la squadra migliore! 🌟
+      </div>
+    </div>
 
-        class="w-full flex items-center justify-center h-full">
-    Ciao {{gameData?.red.leaderName}}
-    </div>
-    <div
-
-        class="w-full flex items-center justify-center h-full">
-      Ciao {{gameData?.blue.leaderName}}
-    </div>
-    <div class="w-full flex items-center justify-center h-full">
-      <p class="text-xl font-semibold mt-4">Buon divertimento {{gameData?.red.leaderName}} e {{gameData?.blue.leaderName}} che vinca la squadra migliore!</p>
-    </div>
     <!-- Domanda, opzioni, tempo e score-->
     <div
       v-if="currentQuestionData?.team && !isGameEnded"
