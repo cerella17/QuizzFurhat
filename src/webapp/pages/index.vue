@@ -110,26 +110,39 @@ const haDettoUnaPresente = computed(
         <h1 class="text-2xl">La partita è terminata...</h1>
       </div>
       <div
-        v-if="showScore && gameData"
-        class="flex flex-col items-center justify-center mt-5 h-full"
+          v-if="showScore && gameData"
+          class="flex flex-col items-center justify-center mt-5 h-full"
       >
-        <h1
-          v-if="gameData?.red.score > gameData?.blue.score"
-          class="text-2xl font-bold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg"
-        >
-          La squadra rossa ha vinto con uno score di {{ gameData?.red.score }}
-        </h1>
-        <h1
-          v-else-if="gameData?.blue.score > gameData?.red.score"
-          class="text-2xl font-bold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg"
-        >
-          La squadra blu ha vinto con uno score di {{ gameData?.blue.score }}
-        </h1>
-        <h1 v-else class="text-2xl font-bold my-4 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg">
-          La partita è finita in parità con uno score di {{ gameData?.red.score }} a
-          {{ gameData?.blue.score }}
-        </h1>
+        <div v-if="gameData?.red.score > gameData?.blue.score" class="text-center">
+          <h1
+              class="text-4xl font-extrabold my-4 py-2 px-4 bg-red-100 text-red-600 rounded-lg"
+          >
+            La squadra rossa ha vinto con uno score di {{ gameData?.red.score }}
+          </h1>
+          <p class="text-lg my-2 text-blue-700">
+            La squadra blu ha ottenuto uno score di {{ gameData?.blue.score }}
+          </p>
+        </div>
+        <div v-else-if="gameData?.blue.score > gameData?.red.score" class="text-center">
+          <h1
+              class="text-4xl font-extrabold my-4 py-2 px-4 bg-blue-100 text-blue-600 rounded-lg"
+          >
+            La squadra blu ha vinto con uno score di {{ gameData?.blue.score }}
+          </h1>
+          <p class="text-lg my-2 text-red-700">
+            La squadra rossa ha ottenuto uno score di {{ gameData?.red.score }}
+          </p>
+        </div>
+        <div v-else class="text-center">
+          <h1
+              class="text-2xl font-bold my-4 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg"
+          >
+            La partita è finita in parità con uno score di {{ gameData?.red.score }} a
+            {{ gameData?.blue.score }}
+          </h1>
+        </div>
       </div>
+
     </div>
   </div>
 </template>
