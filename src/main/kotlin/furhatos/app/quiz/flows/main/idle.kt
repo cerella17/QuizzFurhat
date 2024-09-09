@@ -241,6 +241,7 @@ val QuizGameAskQuestion: State = state {
 }
 
 val QuizGameListenForAnswer: State = state {
+    var tentativi = 2
     onEntry {
         // guardare il capo gruppo della squadra che deve rispondere
         furhat.attend(
@@ -300,6 +301,17 @@ val QuizGameListenForAnswer: State = state {
         }
     }
     onResponse {
+        tentativi--
+        if (tentativi <= 0) {
+            furhat.say(frasiRispostaSbagliata[Random.nextInt(frasiRispostaSbagliata.size - 1)])
+            if (QuizGameManager.round < QuizGameManager.maxRounds) {
+                furhat.attendNobody()
+                delay(1000)
+                goto(QuizGameNewQuestion)
+            } else {
+                goto(QuizGameEnd)
+            }
+        }
         furhat.say("Non ho capito.")
         // guardare il capo gruppo della squadra che deve rispondere
         furhat.attend(

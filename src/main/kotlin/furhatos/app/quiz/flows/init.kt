@@ -10,9 +10,6 @@ import furhatos.flow.kotlin.furhat.characters.Characters
 import furhatos.flow.kotlin.state
 import furhatos.flow.kotlin.users
 import furhatos.flow.kotlin.voice.Voice
-import furhatos.gestures.Gesture
-import furhatos.gestures.Gestures
-import furhatos.skills.RemoteGUI
 import furhatos.util.Language
 
 val Init: State = state() {
@@ -25,9 +22,6 @@ val Init: State = state() {
         furhat.voice = Voice("Adriano-Neural")
         // Inizializza il volto
         furhat.setCharacter(Characters.Adult_Legacy.Geremy)
-
-        // Host the GUI
-        RemoteGUI("WEBAPP", port = 3000)
 
         goto(Idle)
     }

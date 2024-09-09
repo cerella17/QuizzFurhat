@@ -12,8 +12,8 @@ object QuizGameManager {
     var round: Int = 0
 
     // editable
-    var maxRounds: Int = 4
-    var timeForQuestionTimeout: Int = 30000 // in ms
+    var maxRounds: Int = 8
+    var timeForQuestionTimeout: Int = 60000 // in ms
 
     fun nextTurn() {
         currentTurnTeam = if (currentTurnTeam == TeamEnum.RED) TeamEnum.BLUE else TeamEnum.RED
