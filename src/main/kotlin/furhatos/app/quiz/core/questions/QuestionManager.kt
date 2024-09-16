@@ -222,7 +222,7 @@ class Question(
     }
 
     fun correctAnswer(): String {
-        return answers.find { it in options } ?: ""
+        return answers.map { it.lowercase() }.find { it in options } ?: ""
     }
 
     fun toQuestionTextSpeech(): String {
