@@ -14,6 +14,7 @@ class QuestionSet {
 
     init {
         loadAndShuffleQuestions()
+        println(questions.map { it.answers })
     }
 
     fun next(): Question {
@@ -222,7 +223,7 @@ class Question(
     }
 
     fun correctAnswer(): String {
-        return answers.map { it.lowercase() }.find { it in options } ?: ""
+        return answers.find { it -> it.lowercase() in options.map { it.lowercase() } } ?: ""
     }
 
     fun toQuestionTextSpeech(): String {
