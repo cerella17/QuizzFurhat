@@ -49,6 +49,7 @@ class QuestionSet {
                {
                   "question":"Quale proprietà CSS controlla la dimensione del testo?",
                   "answers":[
+                     "Font-size",
                      "font size",
                      "la terza",
                      "font Sites",
@@ -70,6 +71,7 @@ class QuestionSet {
                {
                   "question":"In JavaScript, come si invoca una funzione denominata “ciao()”?",
                   "answers":[
+                     "ciao()",
                      "ciao parentesi tonde",
                      "ciao",
                      "la seconda",
@@ -90,6 +92,7 @@ class QuestionSet {
                {
                   "question":"In JavaScript, quale evento si verifica quando l’utente clicca su un element HTML?",
                   "answers":[
+                     "Onclick",
                      "onclick",
                      "un click",
                      "on click",
@@ -156,6 +159,7 @@ class QuestionSet {
                {
                   "question":"In CSS, quale è lo statement che consente di non visualizzare un particolare elemento (tag)?",
                   "answers":[
+                     "Display: none",
                      "Display none",
                      "Display non",
                      "display non è",
