@@ -34,7 +34,7 @@ class QuestionSet {
                   "alt",
                   "la prima",
                   "la A",
-                  "la risposta uno",
+                  "la uno",
                   "prima",
                   "A",
                   "uno"
