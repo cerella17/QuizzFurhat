@@ -14,7 +14,6 @@ class QuestionSet {
 
     init {
         loadAndShuffleQuestions()
-        println(questions.map { it.answers })
     }
 
     fun next(): Question {
