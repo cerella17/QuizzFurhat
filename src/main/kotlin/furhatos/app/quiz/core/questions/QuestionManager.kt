@@ -32,6 +32,7 @@ class QuestionSet {
                {
                   "question":"In CSS, quale delle seguenti proprietà di un tag ancora implica un collegamento ipertestuale ancora non visitato? ",
                   "answers":[
+                  "Link",
                      "link",
                      "la prima",
                      "la A",
@@ -93,6 +94,7 @@ class QuestionSet {
                {
                   "question":"In JavaScript, quale evento si verifica quando l’utente clicca su un element HTML?",
                   "answers":[
+                     "ho un click",
                      "Onclick",
                      "onclick",
                      "un click",
@@ -160,6 +162,9 @@ class QuestionSet {
                {
                   "question":"In CSS, quale è lo statement che consente di non visualizzare un particolare elemento (tag)?",
                   "answers":[
+                     "il display non",
+                     "il Display none",
+                     "il display non è",
                      "Display: none",
                      "Display none",
                      "Display non",
@@ -182,6 +187,7 @@ class QuestionSet {
                {
                   "question":"La sessione tra più richieste di uno stesso client può essere mantenuta:",
                   "answers":[
+                     "utilizzando http session",
                      "utilizzando HttpSession",
                      "HttpSession",
                      "http session",
