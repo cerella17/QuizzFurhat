@@ -66,7 +66,6 @@ val ExplainRules: State = state {
     onEntry {
         users.setSimpleEngagementPolicy(EngagementDistanceInGame, EngagementDistanceInGame, EngagementMaxUsersInGame)
 
-        // TODO: Tell them the rules of the quiz
         furhat.say {
             +glance(users.random, duration = 20000)
             +"Benvenuti al quiz! Vi farò ${QuizGameManager.maxRounds} domande a scelta multipla."
@@ -96,10 +95,11 @@ val PreQuiz: State = state {
             furhat.say(frasiTroppePersone[Random.nextInt(frasiTroppePersone.size)])
             delay(2000)
         }
-        // Assegna le squadre
+        
         if (users.list.size != 2)
             reentry()
 
+        // Assegna le squadre
         goto(assignTeamToLeaders(users.list[0], users.list[1]))
     }
 }
@@ -165,6 +165,7 @@ val QuizGameInit: State = state {
                 )
             )
         }
+
         // Aumento la distanza di engagement per il quiz
         users.setSimpleEngagementPolicy(initEngagementDistance, initEngagementDistance, EngagementMaxUsersInGame)
         furhat.say("Perfetto, iniziamo!")
